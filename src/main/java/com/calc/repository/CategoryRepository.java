@@ -8,6 +8,5 @@ import java.util.List;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
     List<Category> findByUserOrderByTypeAscNameAsc(User user);
-    List<Category> findByUserIdAndParentIsNull(Long userId);
     List<Category> findByUserId(Long userId);
 }

@@ -37,11 +37,6 @@ public class CategoryService {
         category.setUser(user);
         category.setName(request.name());
         category.setType(request.type());
-        if (request.parentId() != null) {
-            Category parent = categoryRepository.findById(request.parentId())
-                    .orElseThrow(() -> new RuntimeException("Parent category not found"));
-            category.setParent(parent);
-        }
         category.setIcon(request.icon());
         category.setColor(request.color());
         category = categoryRepository.save(category);
@@ -57,13 +52,6 @@ public class CategoryService {
         }
         category.setName(request.name());
         category.setType(request.type());
-        if (request.parentId() != null) {
-            Category parent = categoryRepository.findById(request.parentId())
-                    .orElseThrow(() -> new RuntimeException("Parent category not found"));
-            category.setParent(parent);
-        } else {
-            category.setParent(null);
-        }
         category.setIcon(request.icon());
         category.setColor(request.color());
         category = categoryRepository.save(category);
@@ -82,7 +70,6 @@ public class CategoryService {
 
     private CategoryResponse toResponse(Category c) {
         return new CategoryResponse(c.getId(), c.getName(), c.getType(),
-                c.getParent() != null ? c.getParent().getId() : null,
                 c.getIcon(), c.getColor(), c.getCreatedAt());
     }
 }

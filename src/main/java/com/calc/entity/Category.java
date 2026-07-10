@@ -25,10 +25,6 @@ public class Category {
     @Column(name = "type", nullable = false, length = 10)
     private CategoryType type;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id")
-    private Category parent;
-
     @Column(length = 50)
     private String icon;
 
@@ -51,8 +47,6 @@ public class Category {
     public void setName(String name) { this.name = name; }
     public CategoryType getType() { return type; }
     public void setType(CategoryType type) { this.type = type; }
-    public Category getParent() { return parent; }
-    public void setParent(Category parent) { this.parent = parent; }
     public String getIcon() { return icon; }
     public void setIcon(String icon) { this.icon = icon; }
     public String getColor() { return color; }

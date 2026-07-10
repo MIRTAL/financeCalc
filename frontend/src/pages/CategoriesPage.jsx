@@ -15,7 +15,7 @@ const ICON_NAMES = Object.keys(iconModules).map((k) => {
   return parts[parts.length - 1].replace('.svg', '');
 });
 
-const emptyForm = { name: '', type: 'EXPENSE', parentId: '', icon: '', color: '#2196f3' };
+const emptyForm = { name: '', type: 'EXPENSE', icon: '', color: '#2196f3' };
 
 export default function CategoriesPage() {
   const [items, setItems] = useState([]);
@@ -25,24 +25,25 @@ export default function CategoriesPage() {
   const [error, setError] = useState('');
   const [filter, setFilter] = useState(0);
   const [confirmId, setConfirmId] = useState(null);
+  const [sortAsc, setSortAsc] = useState(true);
 
   const filtered = filter === 0 ? items : items.filter((c) => c.type === (filter === 1 ? 'INCOME' : 'EXPENSE'));
+  const sorted = [...filtered].sort((a, b) => sortAsc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
 
   const load = () => categoriesApi.list().then((r) => setItems(r.data)).catch((e) => setError(getErrorMessage(e)));
   useEffect(() => { load(); }, []);
 
-  const parents = items.filter((c) => c.type === form.type && c.id !== editId);
 
   const openCreate = () => { setEditId(null); setForm(emptyForm); setOpen(true); };
   const openEdit = (item) => {
     setEditId(item.id);
-    setForm({ name: item.name, type: item.type, parentId: item.parentId || '', icon: item.icon || '', color: item.color || '#2196f3' });
+    setForm({ name: item.name, type: item.type, icon: item.icon || '', color: item.color || '#2196f3' });
     setOpen(true);
   };
 
   const handleSave = async () => {
     try {
-      const payload = { ...form, parentId: form.parentId || null };
+      const payload = { ...form };
       if (editId) await categoriesApi.update(editId, payload);
       else await categoriesApi.create(payload);
       setOpen(false);
@@ -70,15 +71,18 @@ export default function CategoriesPage() {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Название</TableCell>
+              <TableCell>
+                <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, cursor: 'pointer' }} onClick={() => setSortAsc(!sortAsc)}>
+                  Название <SvgIcon name={sortAsc ? 'ArrowUp' : 'ArrowDown'} sx={{ height: '1em', width: 'auto', opacity: 0.5 }} />
+                </Box>
+              </TableCell>
               <TableCell>Тип</TableCell>
-              <TableCell>Родитель</TableCell>
               <TableCell>Цвет</TableCell>
               <TableCell align="right">Действия</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {filtered.map((item) => (
+            {sorted.map((item) => (
               <TableRow key={item.id}>
                 <TableCell>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -89,7 +93,6 @@ export default function CategoriesPage() {
                 <TableCell>
                   <Chip label={item.type === 'INCOME' ? 'Доход' : 'Расход'} color={item.type === 'INCOME' ? 'success' : 'error'} size="small" />
                 </TableCell>
-                <TableCell>{item.parentId ? items.find(p => p.id === item.parentId)?.name || '—' : '—'}</TableCell>
                 <TableCell><Box sx={{ width: 24, height: 24, borderRadius: 1, bgcolor: item.color }} /></TableCell>
                 <TableCell align="right">
                   <IconButton onClick={() => openEdit(item)}><SvgIcon name="Edit" /></IconButton>
@@ -105,12 +108,8 @@ export default function CategoriesPage() {
         <DialogTitle>{editId ? 'Редактировать категорию' : 'Новая категория'}</DialogTitle>
         <DialogContent>
           <TextField fullWidth label="Название" margin="normal" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-          <TextField fullWidth select label="Тип" margin="normal" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value, parentId: '' })}>
+          <TextField fullWidth select label="Тип" margin="normal" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}>
             {CATEGORY_TYPES.map((t) => <MenuItem key={t.value} value={t.value}>{t.label}</MenuItem>)}
-          </TextField>
-          <TextField fullWidth select label="Родительская категория" margin="normal" value={form.parentId} onChange={(e) => setForm({ ...form, parentId: e.target.value })}>
-            <MenuItem value="">Нет</MenuItem>
-            {parents.map((p) => <MenuItem key={p.id} value={p.id}>{p.name}</MenuItem>)}
           </TextField>
           <TextField fullWidth select label="Иконка" margin="normal" value={form.icon}
             onChange={(e) => setForm({ ...form, icon: e.target.value })}
