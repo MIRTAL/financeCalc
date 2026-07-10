@@ -8,9 +8,11 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import { useEffect, useState } from 'react';
 import { accountsApi, categoriesApi, transactionsApi } from '../api/services';
+import { useCurrency } from '../context/CurrencyContext';
 import { formatDate, formatMoney, getErrorMessage, todayISO, TRANSACTION_TYPES } from '../utils/constants';
 
 export default function TransactionsPage() {
+  const { currency } = useCurrency();
   const [tab, setTab] = useState(0);
   const [items, setItems] = useState([]);
   const [accounts, setAccounts] = useState([]);
@@ -101,7 +103,7 @@ export default function TransactionsPage() {
                 </TableCell>
                 <TableCell>{item.accountName}</TableCell>
                 <TableCell>{item.categoryName || '—'}</TableCell>
-                <TableCell>{formatMoney(item.amount)}</TableCell>
+                <TableCell>{formatMoney(item.amount, currency)}</TableCell>
                 <TableCell>{item.description || '—'}</TableCell>
                 <TableCell align="right">
                   <IconButton color="error" onClick={() => handleDelete(item.id)}><DeleteIcon /></IconButton>

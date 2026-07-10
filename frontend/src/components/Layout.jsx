@@ -7,6 +7,8 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  MenuItem,
+  Select,
   Toolbar,
   Typography,
   useMediaQuery,
@@ -24,6 +26,8 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { CURRENCIES } from '../utils/constants';
+import { useCurrency } from '../context/CurrencyContext';
 
 const drawerWidth = 260;
 
@@ -42,6 +46,7 @@ export default function Layout() {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, logout } = useAuth();
+  const { currency, setCurrency } = useCurrency();
   const navigate = useNavigate();
 
   const drawer = (
@@ -110,6 +115,14 @@ export default function Layout() {
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             Калькулятор финансов
           </Typography>
+          <Select
+            size="small"
+            value={currency}
+            onChange={(e) => setCurrency(e.target.value)}
+            sx={{ mr: 2, minWidth: 80, '& .MuiSelect-select': { py: 0.5 } }}
+          >
+            {CURRENCIES.map((c) => <MenuItem key={c} value={c}>{c}</MenuItem>)}
+          </Select>
           <Typography variant="body2" color="text.secondary">
             {user?.username}
           </Typography>

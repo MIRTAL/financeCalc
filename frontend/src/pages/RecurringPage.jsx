@@ -7,6 +7,7 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useEffect, useState } from 'react';
 import { accountsApi, categoriesApi, recurringApi } from '../api/services';
+import { useCurrency } from '../context/CurrencyContext';
 import { formatDate, formatMoney, getErrorMessage, RECURRENCE_FREQUENCIES, todayISO, TRANSACTION_TYPES } from '../utils/constants';
 
 const emptyForm = {
@@ -15,6 +16,7 @@ const emptyForm = {
 };
 
 export default function RecurringPage() {
+  const { currency } = useCurrency();
   const [items, setItems] = useState([]);
   const [accounts, setAccounts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -84,7 +86,7 @@ export default function RecurringPage() {
                 </TableCell>
                 <TableCell>{item.accountName}</TableCell>
                 <TableCell>{item.categoryName || '—'}</TableCell>
-                <TableCell>{formatMoney(item.amount)}</TableCell>
+                <TableCell>{formatMoney(item.amount, currency)}</TableCell>
                 <TableCell>{RECURRENCE_FREQUENCIES.find((f) => f.value === item.frequency)?.label}</TableCell>
                 <TableCell>{formatDate(item.nextDate)}</TableCell>
                 <TableCell>{item.active ? 'Да' : 'Нет'}</TableCell>

@@ -8,11 +8,13 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import SavingsIcon from '@mui/icons-material/Savings';
 import { useEffect, useState } from 'react';
 import { categoriesApi, goalsApi } from '../api/services';
+import { useCurrency } from '../context/CurrencyContext';
 import { formatDate, formatMoney, getErrorMessage, todayISO } from '../utils/constants';
 
 const emptyForm = { name: '', targetAmount: '', targetDate: todayISO(), categoryId: '' };
 
 export default function GoalsPage() {
+  const { currency } = useCurrency();
   const [items, setItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [form, setForm] = useState(emptyForm);
@@ -79,8 +81,8 @@ export default function GoalsPage() {
             {items.map((item) => (
               <TableRow key={item.id}>
                 <TableCell>{item.name}</TableCell>
-                <TableCell>{formatMoney(item.targetAmount)}</TableCell>
-                <TableCell>{formatMoney(item.currentAmount)}</TableCell>
+                <TableCell>{formatMoney(item.targetAmount, currency)}</TableCell>
+                <TableCell>{formatMoney(item.currentAmount, currency)}</TableCell>
                 <TableCell>{formatDate(item.targetDate)}</TableCell>
                 <TableCell sx={{ minWidth: 180 }}>
                   <LinearProgress variant="determinate" value={Math.min(item.progressPercent, 100)} color="secondary" />

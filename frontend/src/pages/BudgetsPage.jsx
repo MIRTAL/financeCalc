@@ -7,11 +7,13 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useEffect, useState } from 'react';
 import { budgetsApi, categoriesApi } from '../api/services';
+import { useCurrency } from '../context/CurrencyContext';
 import { BUDGET_PERIODS, formatMoney, getErrorMessage, todayISO } from '../utils/constants';
 
 const emptyForm = { categoryId: '', amount: '', period: 'MONTHLY', startDate: todayISO() };
 
 export default function BudgetsPage() {
+  const { currency } = useCurrency();
   const [items, setItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [form, setForm] = useState(emptyForm);
@@ -64,8 +66,8 @@ export default function BudgetsPage() {
             {items.map((item) => (
               <TableRow key={item.id}>
                 <TableCell>{item.categoryName}</TableCell>
-                <TableCell>{formatMoney(item.amount)}</TableCell>
-                <TableCell>{formatMoney(item.spent)}</TableCell>
+                <TableCell>{formatMoney(item.amount, currency)}</TableCell>
+                <TableCell>{formatMoney(item.spent, currency)}</TableCell>
                 <TableCell>{item.period === 'MONTHLY' ? 'Месяц' : 'Год'}</TableCell>
                 <TableCell sx={{ minWidth: 180 }}>
                   <LinearProgress
