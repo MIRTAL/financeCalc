@@ -23,6 +23,9 @@ export default function TransactionsPage() {
   const [transfer, setTransfer] = useState({ fromAccountId: '', toAccountId: '', amount: '', transactionDate: todayISO(), description: '' });
   const [confirmId, setConfirmId] = useState(null);
   const [editId, setEditId] = useState(null);
+  const [filterTab, setFilterTab] = useState(0);
+
+  const filtered = filterTab === 0 ? items : items.filter((t) => t.type === (filterTab === 1 ? 'INCOME' : 'EXPENSE'));
 
   const load = async () => {
     try {
@@ -99,6 +102,11 @@ export default function TransactionsPage() {
         <Button variant="contained" startIcon={<SvgIcon name="Add" />} onClick={openCreate}>Добавить</Button>
       </Box>
       {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}
+      <Tabs value={filterTab} onChange={(_, v) => setFilterTab(v)} sx={{ mb: 1 }}>
+        <Tab label="Все транзакции" />
+        <Tab label="Доходы" />
+        <Tab label="Расходы" />
+      </Tabs>
       <Card>
         <Table>
           <TableHead>
@@ -113,7 +121,7 @@ export default function TransactionsPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {items.map((item) => (
+            {filtered.map((item) => (
               <TableRow key={item.id}>
                 <TableCell>{formatDate(item.transactionDate)}</TableCell>
                 <TableCell>
