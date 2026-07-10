@@ -14,7 +14,8 @@ import { useEffect, useState } from 'react';
 import { Doughnut, Line } from 'react-chartjs-2';
 import { dashboardApi } from '../api/services';
 import { useCurrency } from '../context/CurrencyContext';
-import { formatMoney, getErrorMessage } from '../utils/constants';
+import { getErrorMessage } from '../utils/constants';
+import MoneyDisplay from '../utils/MoneyDisplay';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend);
 
@@ -80,18 +81,18 @@ export default function DashboardPage() {
 
       <Grid container spacing={2} mb={3}>
         <Grid item xs={12} sm={6} md={3}>
-          <StatCard title="Общий баланс" value={formatMoney(data.totalBalance, currency)} />
+          <StatCard title="Общий баланс" value={<MoneyDisplay amount={data.totalBalance} currency={currency} />} />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <StatCard title="Доходы за период" value={formatMoney(data.totalIncome, currency)} color="success.main" />
+          <StatCard title="Доходы за период" value={<MoneyDisplay amount={data.totalIncome} currency={currency} />} color="success.main" />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <StatCard title="Расходы за период" value={formatMoney(data.totalExpense, currency)} color="error.main" />
+          <StatCard title="Расходы за период" value={<MoneyDisplay amount={data.totalExpense} currency={currency} />} color="error.main" />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Чистый поток"
-            value={formatMoney(data.netIncome, currency)}
+            value={<MoneyDisplay amount={data.netIncome} currency={currency} />}
             color={Number(data.netIncome) >= 0 ? 'success.main' : 'error.main'}
           />
         </Grid>
@@ -103,7 +104,7 @@ export default function DashboardPage() {
             <CardContent>
               <Typography variant="h6" gutterBottom>Расходы по категориям</Typography>
               {data.expensesByCategory.length ? (
-                <Box sx={{ maxHeight: 3600, display: 'flex', justifyContent: 'center' }}>
+                <Box sx={{ maxHeight: 280, display: 'flex', justifyContent: 'center' }}>
                   <Doughnut data={pieData} options={{ maintainAspectRatio: true }} />
                 </Box>
               ) : (
@@ -117,7 +118,7 @@ export default function DashboardPage() {
             <CardContent>
               <Typography variant="h6" gutterBottom>Динамика доходов и расходов</Typography>
               {data.monthlyData.length ? (
-                <Box sx={{ maxHeight: 360 }}>
+                <Box sx={{ maxHeight: 280 }}>
                   <Line data={lineData} options={{ responsive: true, maintainAspectRatio: true }} />
                 </Box>
               ) : (
@@ -133,7 +134,7 @@ export default function DashboardPage() {
           <CardContent>
             <Typography variant="h6" gutterBottom>Прогноз накоплений</Typography>
             <Typography variant="body2" color="text.secondary">Прогнозируемый остаток</Typography>
-            <Typography fontWeight={600}>{formatMoney(data.forecast, currency)}</Typography>
+            <Typography fontWeight={600}><MoneyDisplay amount={data.forecast} currency={currency} /></Typography>
           </CardContent>
         </Card>
       )}

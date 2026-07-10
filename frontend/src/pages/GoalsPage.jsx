@@ -3,13 +3,12 @@ import {
   IconButton, LinearProgress, MenuItem, Table, TableBody, TableCell, TableHead, TableRow,
   TextField, Typography,
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
-import SavingsIcon from '@mui/icons-material/Savings';
 import { useEffect, useState } from 'react';
 import { categoriesApi, goalsApi } from '../api/services';
 import { useCurrency } from '../context/CurrencyContext';
-import { formatDate, formatMoney, getErrorMessage, todayISO } from '../utils/constants';
+import SvgIcon from '../utils/SvgIcon';
+import MoneyDisplay from '../utils/MoneyDisplay';
+import { formatDate, getErrorMessage, todayISO } from '../utils/constants';
 
 const emptyForm = { name: '', targetAmount: '', targetDate: todayISO(), categoryId: '' };
 
@@ -62,7 +61,7 @@ export default function GoalsPage() {
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h4">Финансовые цели</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => setOpen(true)}>Добавить</Button>
+        <Button variant="contained" startIcon={<SvgIcon name="Add" />} onClick={() => setOpen(true)}>Добавить</Button>
       </Box>
       {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}
       <Card>
@@ -81,16 +80,16 @@ export default function GoalsPage() {
             {items.map((item) => (
               <TableRow key={item.id}>
                 <TableCell>{item.name}</TableCell>
-                <TableCell>{formatMoney(item.targetAmount, currency)}</TableCell>
-                <TableCell>{formatMoney(item.currentAmount, currency)}</TableCell>
+                <TableCell><MoneyDisplay amount={item.targetAmount} currency={currency} /></TableCell>
+                <TableCell><MoneyDisplay amount={item.currentAmount} currency={currency} /></TableCell>
                 <TableCell>{formatDate(item.targetDate)}</TableCell>
                 <TableCell sx={{ minWidth: 180 }}>
                   <LinearProgress variant="determinate" value={Math.min(item.progressPercent, 100)} color="secondary" />
                   <Typography variant="caption">{item.progressPercent.toFixed(0)}%</Typography>
                 </TableCell>
                 <TableCell align="right">
-                  <IconButton onClick={() => { setContrib({ id: item.id, amount: '' }); setOpenContrib(true); }}><SavingsIcon /></IconButton>
-                  <IconButton color="error" onClick={() => handleDelete(item.id)}><DeleteIcon /></IconButton>
+                  <IconButton onClick={() => { setContrib({ id: item.id, amount: '' }); setOpenContrib(true); }}><SvgIcon name="Savings" /></IconButton>
+                  <IconButton color="error" onClick={() => handleDelete(item.id)}><SvgIcon name="Delete" /></IconButton>
                 </TableCell>
               </TableRow>
             ))}

@@ -1,12 +1,10 @@
 import {
-  Alert, Box, Button, Card, CardContent, Dialog, DialogActions, DialogContent, DialogTitle,
+  Alert, Box, Button, Card, Dialog, DialogActions, DialogContent, DialogTitle,
   IconButton, MenuItem, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography,
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
 import { useEffect, useState } from 'react';
 import { accountsApi } from '../api/services';
+import SvgIcon from '../utils/SvgIcon';
 import { ACCOUNT_TYPES, CURRENCIES, formatMoney, getErrorMessage } from '../utils/constants';
 
 const emptyForm = { name: '', type: 'CASH', initialBalance: '', currency: 'RUB' };
@@ -48,7 +46,7 @@ export default function AccountsPage() {
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h4">Счета</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate}>Добавить</Button>
+        <Button variant="contained" startIcon={<SvgIcon name="Add" />} onClick={openCreate}>Добавить</Button>
       </Box>
       {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}
       <Card>
@@ -70,8 +68,8 @@ export default function AccountsPage() {
                 <TableCell>{formatMoney(item.currentBalance, item.currency)}</TableCell>
                 <TableCell>{item.currency}</TableCell>
                 <TableCell align="right">
-                  <IconButton onClick={() => openEdit(item)}><EditIcon /></IconButton>
-                  <IconButton color="error" onClick={() => handleDelete(item.id)}><DeleteIcon /></IconButton>
+                  <IconButton onClick={() => openEdit(item)}><SvgIcon name="Edit" /></IconButton>
+                  <IconButton color="error" onClick={() => handleDelete(item.id)}><SvgIcon name="Delete" /></IconButton>
                 </TableCell>
               </TableRow>
             ))}

@@ -14,31 +14,23 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import CategoryIcon from '@mui/icons-material/Category';
-import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
-import SavingsIcon from '@mui/icons-material/Savings';
-import FlagIcon from '@mui/icons-material/Flag';
-import AutorenewIcon from '@mui/icons-material/Autorenew';
-import LogoutIcon from '@mui/icons-material/Logout';
 import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { CURRENCIES } from '../utils/constants';
 import { useCurrency } from '../context/CurrencyContext';
+import SvgIcon from '../utils/SvgIcon';
 
 const drawerWidth = 260;
 
 const navItems = [
-  { to: '/', label: 'Главная', icon: <DashboardIcon /> },
-  { to: '/accounts', label: 'Счета', icon: <AccountBalanceWalletIcon /> },
-  { to: '/categories', label: 'Категории', icon: <CategoryIcon /> },
-  { to: '/transactions', label: 'Транзакции', icon: <ReceiptLongIcon /> },
-  { to: '/budgets', label: 'Бюджеты', icon: <SavingsIcon /> },
-  { to: '/goals', label: 'Цели', icon: <FlagIcon /> },
-  { to: '/recurring', label: 'Периодические', icon: <AutorenewIcon /> },
+  { to: '/', label: 'Главная', icon: <SvgIcon name="Dashboard" /> },
+  { to: '/accounts', label: 'Счета', icon: <SvgIcon name="AccountBalanceWallet" /> },
+  { to: '/categories', label: 'Категории', icon: <SvgIcon name="Category" /> },
+  { to: '/transactions', label: 'Транзакции', icon: <SvgIcon name="ReceiptLong" /> },
+  { to: '/budgets', label: 'Бюджеты', icon: <SvgIcon name="Savings" /> },
+  { to: '/goals', label: 'Цели', icon: <SvgIcon name="Flag" /> },
+  { to: '/recurring', label: 'Периодические', icon: <SvgIcon name="Autorenew" /> },
 ];
 
 export default function Layout() {
@@ -84,7 +76,7 @@ export default function Layout() {
           sx={{ borderRadius: 2 }}
         >
           <ListItemIcon sx={{ minWidth: 40 }}>
-            <LogoutIcon />
+            <SvgIcon name="Logout" />
           </ListItemIcon>
           <ListItemText primary="Выйти" />
         </ListItemButton>
@@ -109,7 +101,7 @@ export default function Layout() {
         <Toolbar>
           {isMobile && (
             <IconButton edge="start" onClick={() => setMobileOpen(!mobileOpen)} sx={{ mr: 2 }}>
-              <MenuIcon />
+              <SvgIcon name="Menu" />
             </IconButton>
           )}
           <Typography variant="h6" sx={{ flexGrow: 1 }}>

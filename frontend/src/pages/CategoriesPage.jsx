@@ -2,12 +2,17 @@ import {
   Alert, Box, Button, Card, Chip, Dialog, DialogActions, DialogContent, DialogTitle,
   IconButton, MenuItem, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography,
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
 import { useEffect, useState } from 'react';
 import { categoriesApi } from '../api/services';
+
+import SvgIcon from '../utils/SvgIcon';
 import { CATEGORY_TYPES, getErrorMessage } from '../utils/constants';
+
+const ICON_NAMES = [
+  'AccountBalanceWallet', 'Add', 'Autorenew', 'Category', 'Dashboard',
+  'Delete', 'Edit', 'Flag', 'Logout', 'Menu', 'ReceiptLong',
+  'Savings', 'SwapHoriz', 'RUB', 'USD', 'EUR', 'BYN',
+];
 
 const emptyForm = { name: '', type: 'EXPENSE', parentId: '', icon: '', color: '#2196f3' };
 
@@ -49,7 +54,7 @@ export default function CategoriesPage() {
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h4">Категории</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate}>Добавить</Button>
+        <Button variant="contained" startIcon={<SvgIcon name="Add" />} onClick={openCreate}>Добавить</Button>
       </Box>
       {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}
       <Card>
@@ -66,15 +71,20 @@ export default function CategoriesPage() {
           <TableBody>
             {items.map((item) => (
               <TableRow key={item.id}>
-                <TableCell>{item.name}</TableCell>
+                <TableCell>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <SvgIcon name={item.icon} sx={{ height: '1.2em', width: 'auto', color: item.color }} />
+                    {item.name}
+                  </Box>
+                </TableCell>
                 <TableCell>
                   <Chip label={item.type === 'INCOME' ? 'Доход' : 'Расход'} color={item.type === 'INCOME' ? 'success' : 'error'} size="small" />
                 </TableCell>
                 <TableCell>{item.parentId ? items.find(p => p.id === item.parentId)?.name || '—' : '—'}</TableCell>
                 <TableCell><Box sx={{ width: 24, height: 24, borderRadius: 1, bgcolor: item.color }} /></TableCell>
                 <TableCell align="right">
-                  <IconButton onClick={() => openEdit(item)}><EditIcon /></IconButton>
-                  <IconButton color="error" onClick={() => handleDelete(item.id)}><DeleteIcon /></IconButton>
+                  <IconButton onClick={() => openEdit(item)}><SvgIcon name="Edit" /></IconButton>
+                  <IconButton color="error" onClick={() => handleDelete(item.id)}><SvgIcon name="Delete" /></IconButton>
                 </TableCell>
               </TableRow>
             ))}
@@ -93,7 +103,16 @@ export default function CategoriesPage() {
             <MenuItem value="">Нет</MenuItem>
             {parents.map((p) => <MenuItem key={p.id} value={p.id}>{p.name}</MenuItem>)}
           </TextField>
-          <TextField fullWidth label="Иконка (MUI name)" margin="normal" value={form.icon} onChange={(e) => setForm({ ...form, icon: e.target.value })} />
+          <TextField fullWidth select label="Иконка" margin="normal" value={form.icon}
+            onChange={(e) => setForm({ ...form, icon: e.target.value })}
+            SelectProps={{ MenuProps: { slotProps: { paper: { sx: { width: 320, p: 1 } } } } }}>
+            <MenuItem value=""><em>Нет</em></MenuItem>
+            {ICON_NAMES.map((name) => (
+              <MenuItem key={name} value={name} sx={{ display: 'inline-flex', width: '20%', justifyContent: 'center', minHeight: 48 }}>
+                <SvgIcon name={name} sx={{ height: '1.5em', width: 'auto' }} />
+              </MenuItem>
+            ))}
+          </TextField>
           <TextField fullWidth label="Цвет" type="color" margin="normal" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} />
         </DialogContent>
         <DialogActions>

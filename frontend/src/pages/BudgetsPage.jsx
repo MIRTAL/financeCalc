@@ -3,12 +3,12 @@ import {
   IconButton, LinearProgress, MenuItem, Table, TableBody, TableCell, TableHead, TableRow,
   TextField, Typography,
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { useEffect, useState } from 'react';
 import { budgetsApi, categoriesApi } from '../api/services';
 import { useCurrency } from '../context/CurrencyContext';
-import { BUDGET_PERIODS, formatMoney, getErrorMessage, todayISO } from '../utils/constants';
+import SvgIcon from '../utils/SvgIcon';
+import MoneyDisplay from '../utils/MoneyDisplay';
+import { BUDGET_PERIODS, getErrorMessage, todayISO } from '../utils/constants';
 
 const emptyForm = { categoryId: '', amount: '', period: 'MONTHLY', startDate: todayISO() };
 
@@ -47,7 +47,7 @@ export default function BudgetsPage() {
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h4">Бюджеты</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => setOpen(true)}>Добавить</Button>
+        <Button variant="contained" startIcon={<SvgIcon name="Add" />} onClick={() => setOpen(true)}>Добавить</Button>
       </Box>
       {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}
       <Card>
@@ -66,8 +66,8 @@ export default function BudgetsPage() {
             {items.map((item) => (
               <TableRow key={item.id}>
                 <TableCell>{item.categoryName}</TableCell>
-                <TableCell>{formatMoney(item.amount, currency)}</TableCell>
-                <TableCell>{formatMoney(item.spent, currency)}</TableCell>
+                <TableCell><MoneyDisplay amount={item.amount} currency={currency} /></TableCell>
+                <TableCell><MoneyDisplay amount={item.spent} currency={currency} /></TableCell>
                 <TableCell>{item.period === 'MONTHLY' ? 'Месяц' : 'Год'}</TableCell>
                 <TableCell sx={{ minWidth: 180 }}>
                   <LinearProgress
@@ -78,7 +78,7 @@ export default function BudgetsPage() {
                   <Typography variant="caption">{item.progressPercent.toFixed(0)}%</Typography>
                 </TableCell>
                 <TableCell align="right">
-                  <IconButton color="error" onClick={() => handleDelete(item.id)}><DeleteIcon /></IconButton>
+                  <IconButton color="error" onClick={() => handleDelete(item.id)}><SvgIcon name="Delete" /></IconButton>
                 </TableCell>
               </TableRow>
             ))}

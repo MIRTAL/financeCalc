@@ -3,12 +3,12 @@ import {
   IconButton, MenuItem, Switch, FormControlLabel, Table, TableBody, TableCell, TableHead, TableRow,
   TextField, Typography,
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { useEffect, useState } from 'react';
 import { accountsApi, categoriesApi, recurringApi } from '../api/services';
 import { useCurrency } from '../context/CurrencyContext';
-import { formatDate, formatMoney, getErrorMessage, RECURRENCE_FREQUENCIES, todayISO, TRANSACTION_TYPES } from '../utils/constants';
+import SvgIcon from '../utils/SvgIcon';
+import MoneyDisplay from '../utils/MoneyDisplay';
+import { formatDate, getErrorMessage, RECURRENCE_FREQUENCIES, todayISO, TRANSACTION_TYPES } from '../utils/constants';
 
 const emptyForm = {
   accountId: '', categoryId: '', amount: '', type: 'EXPENSE', frequency: 'MONTHLY',
@@ -61,7 +61,7 @@ export default function RecurringPage() {
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h4">Периодические операции</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => setOpen(true)}>Добавить</Button>
+        <Button variant="contained" startIcon={<SvgIcon name="Add" />} onClick={() => setOpen(true)}>Добавить</Button>
       </Box>
       {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}
       <Card>
@@ -86,12 +86,12 @@ export default function RecurringPage() {
                 </TableCell>
                 <TableCell>{item.accountName}</TableCell>
                 <TableCell>{item.categoryName || '—'}</TableCell>
-                <TableCell>{formatMoney(item.amount, currency)}</TableCell>
+                <TableCell><MoneyDisplay amount={item.amount} currency={currency} /></TableCell>
                 <TableCell>{RECURRENCE_FREQUENCIES.find((f) => f.value === item.frequency)?.label}</TableCell>
                 <TableCell>{formatDate(item.nextDate)}</TableCell>
                 <TableCell>{item.active ? 'Да' : 'Нет'}</TableCell>
                 <TableCell align="right">
-                  <IconButton color="error" onClick={() => handleDelete(item.id)}><DeleteIcon /></IconButton>
+                  <IconButton color="error" onClick={() => handleDelete(item.id)}><SvgIcon name="Delete" /></IconButton>
                 </TableCell>
               </TableRow>
             ))}

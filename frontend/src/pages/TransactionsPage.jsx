@@ -3,13 +3,12 @@ import {
   IconButton, MenuItem, Tab, Tabs, Table, TableBody, TableCell, TableHead, TableRow,
   TextField, Typography,
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
-import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import { useEffect, useState } from 'react';
 import { accountsApi, categoriesApi, transactionsApi } from '../api/services';
 import { useCurrency } from '../context/CurrencyContext';
-import { formatDate, formatMoney, getErrorMessage, todayISO, TRANSACTION_TYPES } from '../utils/constants';
+import SvgIcon from '../utils/SvgIcon';
+import MoneyDisplay from '../utils/MoneyDisplay';
+import { formatDate, getErrorMessage, todayISO, TRANSACTION_TYPES } from '../utils/constants';
 
 export default function TransactionsPage() {
   const { currency } = useCurrency();
@@ -74,7 +73,7 @@ export default function TransactionsPage() {
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h4">Транзакции</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => { setTab(0); setOpen(true); }}>Добавить</Button>
+        <Button variant="contained" startIcon={<SvgIcon name="Add" />} onClick={() => { setTab(0); setOpen(true); }}>Добавить</Button>
       </Box>
       {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}
       <Card>
@@ -103,10 +102,10 @@ export default function TransactionsPage() {
                 </TableCell>
                 <TableCell>{item.accountName}</TableCell>
                 <TableCell>{item.categoryName || '—'}</TableCell>
-                <TableCell>{formatMoney(item.amount, currency)}</TableCell>
+                <TableCell><MoneyDisplay amount={item.amount} currency={currency} /></TableCell>
                 <TableCell>{item.description || '—'}</TableCell>
                 <TableCell align="right">
-                  <IconButton color="error" onClick={() => handleDelete(item.id)}><DeleteIcon /></IconButton>
+                  <IconButton color="error" onClick={() => handleDelete(item.id)}><SvgIcon name="Delete" /></IconButton>
                 </TableCell>
               </TableRow>
             ))}
@@ -118,7 +117,7 @@ export default function TransactionsPage() {
         <DialogTitle>Новая операция</DialogTitle>
         <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ px: 3 }}>
           <Tab label="Доход/Расход" />
-          <Tab label="Перевод" icon={<SwapHorizIcon />} iconPosition="start" />
+          <Tab label="Перевод" icon={<SvgIcon name="SwapHoriz" />} iconPosition="start" />
         </Tabs>
         <DialogContent>
           {tab === 0 ? (
