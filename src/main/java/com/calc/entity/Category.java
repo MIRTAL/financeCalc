@@ -28,9 +28,6 @@ public class Category {
     @Column(length = 50)
     private String icon;
 
-    @Column(length = 7)
-    private String color;
-
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -49,8 +46,6 @@ public class Category {
     public void setType(CategoryType type) { this.type = type; }
     public String getIcon() { return icon; }
     public void setIcon(String icon) { this.icon = icon; }
-    public String getColor() { return color; }
-    public void setColor(String color) { this.color = color; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

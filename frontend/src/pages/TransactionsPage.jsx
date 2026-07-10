@@ -22,6 +22,7 @@ export default function TransactionsPage() {
   const [form, setForm] = useState({ accountId: '', categoryId: '', amount: '', type: 'EXPENSE', transactionDate: todayISO(), description: '' });
   const [transfer, setTransfer] = useState({ fromAccountId: '', toAccountId: '', amount: '', transactionDate: todayISO(), description: '' });
   const [confirmId, setConfirmId] = useState(null);
+  const [editId, setEditId] = useState(null);
 
   const load = async () => {
     try {
@@ -40,28 +41,34 @@ export default function TransactionsPage() {
 
   const handleCreate = async () => {
     try {
-      await transactionsApi.create({
+      const payload = {
         ...form,
         accountId: Number(form.accountId),
         categoryId: form.categoryId ? Number(form.categoryId) : null,
         amount: Number(form.amount),
-      });
+      };
+      if (editId) await transactionsApi.update(editId, payload);
+      else await transactionsApi.create(payload);
       setOpen(false);
+      setEditId(null);
       load();
     } catch (e) { setError(getErrorMessage(e)); }
   };
 
   const handleTransfer = async () => {
     try {
-      await transactionsApi.create({
+      const payload = {
         accountId: Number(transfer.fromAccountId),
         targetAccountId: Number(transfer.toAccountId),
         amount: Number(transfer.amount),
         transactionDate: transfer.transactionDate,
         description: transfer.description,
         type: 'TRANSFER',
-      });
+      };
+      if (editId) await transactionsApi.update(editId, payload);
+      else await transactionsApi.create(payload);
       setOpen(false);
+      setEditId(null);
       load();
     } catch (e) { setError(getErrorMessage(e)); }
   };
@@ -70,11 +77,26 @@ export default function TransactionsPage() {
     try { await transactionsApi.remove(confirmId); load(); setConfirmId(null); } catch (e) { setError(getErrorMessage(e)); setConfirmId(null); }
   };
 
+  const openCreate = () => { setEditId(null); setForm({ accountId: '', categoryId: '', amount: '', type: 'EXPENSE', transactionDate: todayISO(), description: '' }); setTab(0); setOpen(true); };
+  const openEdit = (item) => {
+    setEditId(item.id);
+    setForm({
+      accountId: item.accountId?.toString() || '',
+      categoryId: item.categoryId?.toString() || '',
+      amount: item.amount?.toString() || '',
+      type: item.type === 'TRANSFER' ? 'EXPENSE' : item.type,
+      transactionDate: item.transactionDate || todayISO(),
+      description: item.description || '',
+    });
+    setTab(0);
+    setOpen(true);
+  };
+
   return (
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h4">Транзакции</Typography>
-        <Button variant="contained" startIcon={<SvgIcon name="Add" />} onClick={() => { setTab(0); setOpen(true); }}>Добавить</Button>
+        <Button variant="contained" startIcon={<SvgIcon name="Add" />} onClick={openCreate}>Добавить</Button>
       </Box>
       {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}
       <Card>
@@ -106,6 +128,7 @@ export default function TransactionsPage() {
                 <TableCell><MoneyDisplay amount={item.amount} currency={currency} /></TableCell>
                 <TableCell>{item.description || '—'}</TableCell>
                 <TableCell align="right">
+                  <IconButton onClick={() => openEdit(item)}><SvgIcon name="Edit" /></IconButton>
                   <IconButton color="error" onClick={() => setConfirmId(item.id)}><SvgIcon name="Delete" /></IconButton>
                 </TableCell>
               </TableRow>
@@ -115,7 +138,7 @@ export default function TransactionsPage() {
       </Card>
 
       <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
-        <DialogTitle>Новая операция</DialogTitle>
+        <DialogTitle>{editId ? 'Редактировать операцию' : 'Новая операция'}</DialogTitle>
         <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ px: 3 }}>
           <Tab label="Доход/Расход" />
           <Tab label="Перевод" icon={<SvgIcon name="SwapHoriz" />} iconPosition="start" />
@@ -134,7 +157,7 @@ export default function TransactionsPage() {
               </TextField>
               <TextField fullWidth label="Сумма" type="number" margin="normal" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} />
               <TextField fullWidth label="Дата" type="date" margin="normal" InputLabelProps={{ shrink: true }} value={form.transactionDate} onChange={(e) => setForm({ ...form, transactionDate: e.target.value })} />
-              <TextField fullWidth label="Описание" margin="normal" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+              <TextField fullWidth label="Описание" margin="normal" multiline rows={3} inputProps={{ maxLength: 255 }} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
             </>
           ) : (
             <>
@@ -146,12 +169,12 @@ export default function TransactionsPage() {
               </TextField>
               <TextField fullWidth label="Сумма" type="number" margin="normal" value={transfer.amount} onChange={(e) => setTransfer({ ...transfer, amount: e.target.value })} />
               <TextField fullWidth label="Дата" type="date" margin="normal" InputLabelProps={{ shrink: true }} value={transfer.transactionDate} onChange={(e) => setTransfer({ ...transfer, transactionDate: e.target.value })} />
-              <TextField fullWidth label="Описание" margin="normal" value={transfer.description} onChange={(e) => setTransfer({ ...transfer, description: e.target.value })} />
+              <TextField fullWidth label="Описание" margin="normal" multiline rows={3} inputProps={{ maxLength: 255 }} value={transfer.description} onChange={(e) => setTransfer({ ...transfer, description: e.target.value })} />
             </>
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpen(false)}>Отмена</Button>
+          <Button onClick={() => { setOpen(false); setEditId(null); }}>Отмена</Button>
           <Button variant="contained" onClick={tab === 0 ? handleCreate : handleTransfer}>Сохранить</Button>
         </DialogActions>
       </Dialog>

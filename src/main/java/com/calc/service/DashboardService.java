@@ -13,6 +13,12 @@ import java.util.*;
 @Service
 public class DashboardService {
 
+    private static final String[] CATEGORY_COLORS = {
+        "#4caf50", "#f44336", "#2196f3", "#ff9800", "#9c27b0",
+        "#00bcd4", "#ff5722", "#8bc34a", "#e91e63", "#3f51b5",
+        "#009688", "#ffc107", "#673ab7", "#03a9f4", "#cddc39",
+    };
+
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
     private final CategoryRepository categoryRepository;
@@ -75,7 +81,7 @@ public class DashboardService {
                                 .divide(expense, 4, java.math.RoundingMode.HALF_UP)
                                 .doubleValue() : 0;
                 expenseByCategory.add(new CategorySummary(catId, cat.getName(),
-                        cat.getColor(), cat.getIcon(), amount, percent));
+                        CATEGORY_COLORS[expenseByCategory.size() % CATEGORY_COLORS.length], cat.getIcon(), amount, percent));
             }
         }
 

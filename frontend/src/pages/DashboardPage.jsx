@@ -99,12 +99,12 @@ export default function DashboardPage() {
       </Grid>
 
       <Grid container spacing={2} mb={3}>
-        <Grid item xs={12} md={3}>
+        <Grid item xs={12} md={5}>
           <Card sx={{ height: '100%' }}>
             <CardContent>
               <Typography variant="h6" gutterBottom>Расходы по категориям</Typography>
               {data.expensesByCategory.length ? (
-                <Box sx={{ maxHeight: 280, display: 'flex', justifyContent: 'center' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                   <Doughnut data={pieData} options={{ maintainAspectRatio: true }} />
                 </Box>
               ) : (
@@ -113,12 +113,12 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={9}>
+        <Grid item xs={12} md={7}>
           <Card sx={{ height: '100%' }}>
             <CardContent>
               <Typography variant="h6" gutterBottom>Динамика доходов и расходов</Typography>
               {data.monthlyData.length ? (
-                <Box sx={{ maxHeight: 280 }}>
+                <Box>
                   <Line data={lineData} options={{ responsive: true, maintainAspectRatio: true }} />
                 </Box>
               ) : (

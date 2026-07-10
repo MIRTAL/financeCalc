@@ -91,6 +91,54 @@ public class TransactionService {
     }
 
     @Transactional
+    public TransactionResponse updateTransaction(Long id, Long userId, TransactionRequest request) {
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Transaction not found"));
+        if (!transaction.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Access denied");
+        }
+
+        Account account = accountRepository.findById(request.accountId())
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+        transaction.setAccount(account);
+        transaction.setType(request.type());
+        transaction.setAmount(request.amount());
+        transaction.setDescription(request.description());
+        transaction.setTransactionDate(request.transactionDate());
+
+        if (request.categoryId() != null) {
+            Category category = categoryRepository.findById(request.categoryId())
+                    .orElseThrow(() -> new RuntimeException("Category not found"));
+            transaction.setCategory(category);
+        } else {
+            transaction.setCategory(null);
+        }
+
+        // Update related transfer transaction if it exists
+        if (transaction.getRelatedTransactionId() != null) {
+            Transaction related = transactionRepository.findById(transaction.getRelatedTransactionId()).orElse(null);
+            if (related != null) {
+                related.setAmount(request.amount());
+                related.setTransactionDate(request.transactionDate());
+                transactionRepository.save(related);
+            }
+        }
+
+        // If the original was a transfer and user changed type, clear the relation
+        if (request.type() != Transaction.TransactionType.TRANSFER && transaction.getRelatedTransactionId() != null) {
+            Transaction related = transactionRepository.findById(transaction.getRelatedTransactionId()).orElse(null);
+            if (related != null) {
+                related.setRelatedTransactionId(null);
+                transactionRepository.save(related);
+            }
+            transaction.setRelatedTransactionId(null);
+        }
+
+        transaction = transactionRepository.save(transaction);
+        return toResponse(transaction);
+    }
+
+    @Transactional
     public void deleteTransaction(Long id, Long userId) {
         Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Transaction not found"));

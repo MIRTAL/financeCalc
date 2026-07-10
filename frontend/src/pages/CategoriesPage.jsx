@@ -15,7 +15,7 @@ const ICON_NAMES = Object.keys(iconModules).map((k) => {
   return parts[parts.length - 1].replace('.svg', '');
 });
 
-const emptyForm = { name: '', type: 'EXPENSE', icon: '', color: '#2196f3' };
+const emptyForm = { name: '', type: 'EXPENSE', icon: '' };
 
 export default function CategoriesPage() {
   const [items, setItems] = useState([]);
@@ -37,7 +37,7 @@ export default function CategoriesPage() {
   const openCreate = () => { setEditId(null); setForm(emptyForm); setOpen(true); };
   const openEdit = (item) => {
     setEditId(item.id);
-    setForm({ name: item.name, type: item.type, icon: item.icon || '', color: item.color || '#2196f3' });
+    setForm({ name: item.name, type: item.type, icon: item.icon || '' });
     setOpen(true);
   };
 
@@ -77,7 +77,6 @@ export default function CategoriesPage() {
                 </Box>
               </TableCell>
               <TableCell>Тип</TableCell>
-              <TableCell>Цвет</TableCell>
               <TableCell align="right">Действия</TableCell>
             </TableRow>
           </TableHead>
@@ -86,14 +85,13 @@ export default function CategoriesPage() {
               <TableRow key={item.id}>
                 <TableCell>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <SvgIcon name={item.icon} folder="category" sx={{ height: '1.2em', width: 'auto', color: item.color }} />
+                    <SvgIcon name={item.icon} folder="category" sx={{ height: '1.2em', width: 'auto' }} />
                     {item.name}
                   </Box>
                 </TableCell>
                 <TableCell>
                   <Chip label={item.type === 'INCOME' ? 'Доход' : 'Расход'} color={item.type === 'INCOME' ? 'success' : 'error'} size="small" />
                 </TableCell>
-                <TableCell><Box sx={{ width: 24, height: 24, borderRadius: 1, bgcolor: item.color }} /></TableCell>
                 <TableCell align="right">
                   <IconButton onClick={() => openEdit(item)}><SvgIcon name="Edit" /></IconButton>
                   <IconButton color="error" onClick={() => setConfirmId(item.id)}><SvgIcon name="Delete" /></IconButton>
@@ -121,7 +119,6 @@ export default function CategoriesPage() {
               </MenuItem>
             ))}
           </TextField>
-          <TextField fullWidth label="Цвет" type="color" margin="normal" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)}>Отмена</Button>

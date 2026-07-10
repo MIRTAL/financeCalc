@@ -29,7 +29,6 @@ CREATE TABLE IF NOT EXISTS categories (
     name VARCHAR(100) NOT NULL,
     type VARCHAR(10) NOT NULL CHECK (type IN ('INCOME', 'EXPENSE')),
     icon VARCHAR(50),
-    color VARCHAR(7),
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 

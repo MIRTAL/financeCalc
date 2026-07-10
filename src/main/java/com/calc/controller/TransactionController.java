@@ -40,6 +40,13 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.createTransaction(securityUtil.getCurrentUserId(auth), request));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<TransactionResponse> update(@PathVariable Long id,
+                                                       @RequestBody TransactionRequest request,
+                                                       Authentication auth) {
+        return ResponseEntity.ok(transactionService.updateTransaction(id, securityUtil.getCurrentUserId(auth), request));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id, Authentication auth) {
         transactionService.deleteTransaction(id, securityUtil.getCurrentUserId(auth));
