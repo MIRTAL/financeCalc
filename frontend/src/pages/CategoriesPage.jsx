@@ -8,11 +8,11 @@ import { categoriesApi } from '../api/services';
 import SvgIcon from '../utils/SvgIcon';
 import { CATEGORY_TYPES, getErrorMessage } from '../utils/constants';
 
-const ICON_NAMES = [
-  'AccountBalanceWallet', 'Add', 'Autorenew', 'Category', 'Dashboard',
-  'Delete', 'Edit', 'Flag', 'Logout', 'Menu', 'ReceiptLong',
-  'Savings', 'SwapHoriz', 'RUB', 'USD', 'EUR', 'BYN',
-];
+const iconModules = import.meta.glob('/public/icons/category/*.svg', { eager: true, query: '?url', import: 'default' });
+const ICON_NAMES = Object.keys(iconModules).map((k) => {
+  const parts = k.split('/');
+  return parts[parts.length - 1].replace('.svg', '');
+});
 
 const emptyForm = { name: '', type: 'EXPENSE', parentId: '', icon: '', color: '#2196f3' };
 
@@ -73,7 +73,7 @@ export default function CategoriesPage() {
               <TableRow key={item.id}>
                 <TableCell>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <SvgIcon name={item.icon} sx={{ height: '1.2em', width: 'auto', color: item.color }} />
+                    <SvgIcon name={item.icon} folder="category" sx={{ height: '1.2em', width: 'auto', color: item.color }} />
                     {item.name}
                   </Box>
                 </TableCell>
@@ -109,7 +109,7 @@ export default function CategoriesPage() {
             <MenuItem value=""><em>Нет</em></MenuItem>
             {ICON_NAMES.map((name) => (
               <MenuItem key={name} value={name} sx={{ display: 'inline-flex', width: '20%', justifyContent: 'center', minHeight: 48 }}>
-                <SvgIcon name={name} sx={{ height: '1.5em', width: 'auto' }} />
+                <SvgIcon name={name} folder="category" sx={{ height: '1.5em', width: 'auto' }} />
               </MenuItem>
             ))}
           </TextField>

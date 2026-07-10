@@ -5,7 +5,8 @@ import {
 import { useEffect, useState } from 'react';
 import { accountsApi } from '../api/services';
 import SvgIcon from '../utils/SvgIcon';
-import { ACCOUNT_TYPES, CURRENCIES, formatMoney, getErrorMessage } from '../utils/constants';
+import MoneyDisplay from '../utils/MoneyDisplay';
+import { ACCOUNT_TYPES, CURRENCIES, getErrorMessage } from '../utils/constants';
 
 const emptyForm = { name: '', type: 'CASH', initialBalance: '', currency: 'RUB' };
 
@@ -65,7 +66,7 @@ export default function AccountsPage() {
               <TableRow key={item.id}>
                 <TableCell>{item.name}</TableCell>
                 <TableCell>{ACCOUNT_TYPES.find((t) => t.value === item.type)?.label}</TableCell>
-                <TableCell>{formatMoney(item.currentBalance, item.currency)}</TableCell>
+                <TableCell><MoneyDisplay amount={item.currentBalance} currency={item.currency} /></TableCell>
                 <TableCell>{item.currency}</TableCell>
                 <TableCell align="right">
                   <IconButton onClick={() => openEdit(item)}><SvgIcon name="Edit" /></IconButton>
