@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { accountsApi } from '../api/services';
 import SvgIcon from '../utils/SvgIcon';
 import MoneyDisplay from '../utils/MoneyDisplay';
+import ConfirmDialog from '../components/ConfirmDialog';
 import { ACCOUNT_TYPES, CURRENCIES, getErrorMessage } from '../utils/constants';
 
 const emptyForm = { name: '', type: 'CASH', initialBalance: '', currency: 'RUB' };
@@ -16,6 +17,7 @@ export default function AccountsPage() {
   const [editId, setEditId] = useState(null);
   const [open, setOpen] = useState(false);
   const [error, setError] = useState('');
+  const [confirmId, setConfirmId] = useState(null);
 
   const load = () => accountsApi.list().then((r) => setItems(r.data)).catch((e) => setError(getErrorMessage(e)));
 
@@ -38,9 +40,8 @@ export default function AccountsPage() {
     } catch (e) { setError(getErrorMessage(e)); }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Удалить счёт?')) return;
-    try { await accountsApi.remove(id); load(); } catch (e) { setError(getErrorMessage(e)); }
+  const handleDelete = async () => {
+    try { await accountsApi.remove(confirmId); load(); setConfirmId(null); } catch (e) { setError(getErrorMessage(e)); setConfirmId(null); }
   };
 
   return (
@@ -70,7 +71,7 @@ export default function AccountsPage() {
                 <TableCell>{item.currency}</TableCell>
                 <TableCell align="right">
                   <IconButton onClick={() => openEdit(item)}><SvgIcon name="Edit" /></IconButton>
-                  <IconButton color="error" onClick={() => handleDelete(item.id)}><SvgIcon name="Delete" /></IconButton>
+                  <IconButton color="error" onClick={() => setConfirmId(item.id)}><SvgIcon name="Delete" /></IconButton>
                 </TableCell>
               </TableRow>
             ))}
@@ -97,6 +98,7 @@ export default function AccountsPage() {
           <Button variant="contained" onClick={handleSave}>Сохранить</Button>
         </DialogActions>
       </Dialog>
+      <ConfirmDialog open={!!confirmId} title="Удалить счёт?" onConfirm={handleDelete} onCancel={() => setConfirmId(null)} />
     </Box>
   );
 }

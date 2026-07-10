@@ -8,6 +8,7 @@ import { categoriesApi, goalsApi } from '../api/services';
 import { useCurrency } from '../context/CurrencyContext';
 import SvgIcon from '../utils/SvgIcon';
 import MoneyDisplay from '../utils/MoneyDisplay';
+import ConfirmDialog from '../components/ConfirmDialog';
 import { formatDate, getErrorMessage, todayISO } from '../utils/constants';
 
 const emptyForm = { name: '', targetAmount: '', targetDate: todayISO(), categoryId: '' };
@@ -21,6 +22,7 @@ export default function GoalsPage() {
   const [open, setOpen] = useState(false);
   const [openContrib, setOpenContrib] = useState(false);
   const [error, setError] = useState('');
+  const [confirmId, setConfirmId] = useState(null);
 
   const load = async () => {
     try {
@@ -52,9 +54,8 @@ export default function GoalsPage() {
     } catch (e) { setError(getErrorMessage(e)); }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Удалить цель?')) return;
-    try { await goalsApi.remove(id); load(); } catch (e) { setError(getErrorMessage(e)); }
+  const handleDelete = async () => {
+    try { await goalsApi.remove(confirmId); load(); setConfirmId(null); } catch (e) { setError(getErrorMessage(e)); setConfirmId(null); }
   };
 
   return (
@@ -89,7 +90,7 @@ export default function GoalsPage() {
                 </TableCell>
                 <TableCell align="right">
                   <IconButton onClick={() => { setContrib({ id: item.id, amount: '' }); setOpenContrib(true); }}><SvgIcon name="Savings" /></IconButton>
-                  <IconButton color="error" onClick={() => handleDelete(item.id)}><SvgIcon name="Delete" /></IconButton>
+                  <IconButton color="error" onClick={() => setConfirmId(item.id)}><SvgIcon name="Delete" /></IconButton>
                 </TableCell>
               </TableRow>
             ))}
@@ -124,6 +125,7 @@ export default function GoalsPage() {
           <Button variant="contained" onClick={handleContribute}>Пополнить</Button>
         </DialogActions>
       </Dialog>
+      <ConfirmDialog open={!!confirmId} title="Удалить цель?" onConfirm={handleDelete} onCancel={() => setConfirmId(null)} />
     </Box>
   );
 }

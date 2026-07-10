@@ -8,6 +8,7 @@ import { budgetsApi, categoriesApi } from '../api/services';
 import { useCurrency } from '../context/CurrencyContext';
 import SvgIcon from '../utils/SvgIcon';
 import MoneyDisplay from '../utils/MoneyDisplay';
+import ConfirmDialog from '../components/ConfirmDialog';
 import { BUDGET_PERIODS, getErrorMessage, todayISO } from '../utils/constants';
 
 const emptyForm = { categoryId: '', amount: '', period: 'MONTHLY', startDate: todayISO() };
@@ -19,6 +20,7 @@ export default function BudgetsPage() {
   const [form, setForm] = useState(emptyForm);
   const [open, setOpen] = useState(false);
   const [error, setError] = useState('');
+  const [confirmId, setConfirmId] = useState(null);
 
   const load = async () => {
     try {
@@ -38,9 +40,8 @@ export default function BudgetsPage() {
     } catch (e) { setError(getErrorMessage(e)); }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Удалить бюджет?')) return;
-    try { await budgetsApi.remove(id); load(); } catch (e) { setError(getErrorMessage(e)); }
+  const handleDelete = async () => {
+    try { await budgetsApi.remove(confirmId); load(); setConfirmId(null); } catch (e) { setError(getErrorMessage(e)); setConfirmId(null); }
   };
 
   return (
@@ -78,7 +79,7 @@ export default function BudgetsPage() {
                   <Typography variant="caption">{item.progressPercent.toFixed(0)}%</Typography>
                 </TableCell>
                 <TableCell align="right">
-                  <IconButton color="error" onClick={() => handleDelete(item.id)}><SvgIcon name="Delete" /></IconButton>
+                  <IconButton color="error" onClick={() => setConfirmId(item.id)}><SvgIcon name="Delete" /></IconButton>
                 </TableCell>
               </TableRow>
             ))}
@@ -103,6 +104,7 @@ export default function BudgetsPage() {
           <Button variant="contained" onClick={handleSave}>Сохранить</Button>
         </DialogActions>
       </Dialog>
+      <ConfirmDialog open={!!confirmId} title="Удалить бюджет?" onConfirm={handleDelete} onCancel={() => setConfirmId(null)} />
     </Box>
   );
 }

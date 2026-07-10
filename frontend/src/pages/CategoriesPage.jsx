@@ -1,11 +1,12 @@
 import {
   Alert, Box, Button, Card, Chip, Dialog, DialogActions, DialogContent, DialogTitle,
-  IconButton, MenuItem, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography,
+  IconButton, MenuItem, Table, TableBody, TableCell, TableHead, TableRow, Tabs, Tab, TextField, Typography,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { categoriesApi } from '../api/services';
 
 import SvgIcon from '../utils/SvgIcon';
+import ConfirmDialog from '../components/ConfirmDialog';
 import { CATEGORY_TYPES, getErrorMessage } from '../utils/constants';
 
 const iconModules = import.meta.glob('/public/icons/category/*.svg', { eager: true, query: '?url', import: 'default' });
@@ -22,6 +23,10 @@ export default function CategoriesPage() {
   const [editId, setEditId] = useState(null);
   const [open, setOpen] = useState(false);
   const [error, setError] = useState('');
+  const [filter, setFilter] = useState(0);
+  const [confirmId, setConfirmId] = useState(null);
+
+  const filtered = filter === 0 ? items : items.filter((c) => c.type === (filter === 1 ? 'INCOME' : 'EXPENSE'));
 
   const load = () => categoriesApi.list().then((r) => setItems(r.data)).catch((e) => setError(getErrorMessage(e)));
   useEffect(() => { load(); }, []);
@@ -45,9 +50,8 @@ export default function CategoriesPage() {
     } catch (e) { setError(getErrorMessage(e)); }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Удалить категорию?')) return;
-    try { await categoriesApi.remove(id); load(); } catch (e) { setError(getErrorMessage(e)); }
+  const handleDelete = async () => {
+    try { await categoriesApi.remove(confirmId); load(); setConfirmId(null); } catch (e) { setError(getErrorMessage(e)); setConfirmId(null); }
   };
 
   return (
@@ -57,6 +61,11 @@ export default function CategoriesPage() {
         <Button variant="contained" startIcon={<SvgIcon name="Add" />} onClick={openCreate}>Добавить</Button>
       </Box>
       {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}
+      <Tabs value={filter} onChange={(_, v) => setFilter(v)} sx={{ mb: 1 }}>
+        <Tab label="Все категории" />
+        <Tab label="Категории доходов" />
+        <Tab label="Категории расходов" />
+      </Tabs>
       <Card>
         <Table>
           <TableHead>
@@ -69,7 +78,7 @@ export default function CategoriesPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {items.map((item) => (
+            {filtered.map((item) => (
               <TableRow key={item.id}>
                 <TableCell>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -84,7 +93,7 @@ export default function CategoriesPage() {
                 <TableCell><Box sx={{ width: 24, height: 24, borderRadius: 1, bgcolor: item.color }} /></TableCell>
                 <TableCell align="right">
                   <IconButton onClick={() => openEdit(item)}><SvgIcon name="Edit" /></IconButton>
-                  <IconButton color="error" onClick={() => handleDelete(item.id)}><SvgIcon name="Delete" /></IconButton>
+                  <IconButton color="error" onClick={() => setConfirmId(item.id)}><SvgIcon name="Delete" /></IconButton>
                 </TableCell>
               </TableRow>
             ))}
@@ -120,6 +129,7 @@ export default function CategoriesPage() {
           <Button variant="contained" onClick={handleSave}>Сохранить</Button>
         </DialogActions>
       </Dialog>
+      <ConfirmDialog open={!!confirmId} title="Удалить категорию?" onConfirm={handleDelete} onCancel={() => setConfirmId(null)} />
     </Box>
   );
 }

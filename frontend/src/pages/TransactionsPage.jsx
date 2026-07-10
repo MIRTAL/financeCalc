@@ -8,6 +8,7 @@ import { accountsApi, categoriesApi, transactionsApi } from '../api/services';
 import { useCurrency } from '../context/CurrencyContext';
 import SvgIcon from '../utils/SvgIcon';
 import MoneyDisplay from '../utils/MoneyDisplay';
+import ConfirmDialog from '../components/ConfirmDialog';
 import { formatDate, getErrorMessage, todayISO, TRANSACTION_TYPES } from '../utils/constants';
 
 export default function TransactionsPage() {
@@ -20,6 +21,7 @@ export default function TransactionsPage() {
   const [error, setError] = useState('');
   const [form, setForm] = useState({ accountId: '', categoryId: '', amount: '', type: 'EXPENSE', transactionDate: todayISO(), description: '' });
   const [transfer, setTransfer] = useState({ fromAccountId: '', toAccountId: '', amount: '', transactionDate: todayISO(), description: '' });
+  const [confirmId, setConfirmId] = useState(null);
 
   const load = async () => {
     try {
@@ -64,9 +66,8 @@ export default function TransactionsPage() {
     } catch (e) { setError(getErrorMessage(e)); }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Удалить транзакцию?')) return;
-    try { await transactionsApi.remove(id); load(); } catch (e) { setError(getErrorMessage(e)); }
+  const handleDelete = async () => {
+    try { await transactionsApi.remove(confirmId); load(); setConfirmId(null); } catch (e) { setError(getErrorMessage(e)); setConfirmId(null); }
   };
 
   return (
@@ -105,7 +106,7 @@ export default function TransactionsPage() {
                 <TableCell><MoneyDisplay amount={item.amount} currency={currency} /></TableCell>
                 <TableCell>{item.description || '—'}</TableCell>
                 <TableCell align="right">
-                  <IconButton color="error" onClick={() => handleDelete(item.id)}><SvgIcon name="Delete" /></IconButton>
+                  <IconButton color="error" onClick={() => setConfirmId(item.id)}><SvgIcon name="Delete" /></IconButton>
                 </TableCell>
               </TableRow>
             ))}
@@ -154,6 +155,7 @@ export default function TransactionsPage() {
           <Button variant="contained" onClick={tab === 0 ? handleCreate : handleTransfer}>Сохранить</Button>
         </DialogActions>
       </Dialog>
+      <ConfirmDialog open={!!confirmId} title="Удалить транзакцию?" onConfirm={handleDelete} onCancel={() => setConfirmId(null)} />
     </Box>
   );
 }

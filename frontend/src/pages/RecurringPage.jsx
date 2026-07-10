@@ -8,6 +8,7 @@ import { accountsApi, categoriesApi, recurringApi } from '../api/services';
 import { useCurrency } from '../context/CurrencyContext';
 import SvgIcon from '../utils/SvgIcon';
 import MoneyDisplay from '../utils/MoneyDisplay';
+import ConfirmDialog from '../components/ConfirmDialog';
 import { formatDate, getErrorMessage, RECURRENCE_FREQUENCIES, todayISO, TRANSACTION_TYPES } from '../utils/constants';
 
 const emptyForm = {
@@ -23,6 +24,7 @@ export default function RecurringPage() {
   const [form, setForm] = useState(emptyForm);
   const [open, setOpen] = useState(false);
   const [error, setError] = useState('');
+  const [confirmId, setConfirmId] = useState(null);
 
   const load = async () => {
     try {
@@ -52,9 +54,8 @@ export default function RecurringPage() {
     } catch (e) { setError(getErrorMessage(e)); }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Удалить периодическую операцию?')) return;
-    try { await recurringApi.remove(id); load(); } catch (e) { setError(getErrorMessage(e)); }
+  const handleDelete = async () => {
+    try { await recurringApi.remove(confirmId); load(); setConfirmId(null); } catch (e) { setError(getErrorMessage(e)); setConfirmId(null); }
   };
 
   return (
@@ -91,7 +92,7 @@ export default function RecurringPage() {
                 <TableCell>{formatDate(item.nextDate)}</TableCell>
                 <TableCell>{item.active ? 'Да' : 'Нет'}</TableCell>
                 <TableCell align="right">
-                  <IconButton color="error" onClick={() => handleDelete(item.id)}><SvgIcon name="Delete" /></IconButton>
+                  <IconButton color="error" onClick={() => setConfirmId(item.id)}><SvgIcon name="Delete" /></IconButton>
                 </TableCell>
               </TableRow>
             ))}
@@ -124,6 +125,7 @@ export default function RecurringPage() {
           <Button variant="contained" onClick={handleSave}>Сохранить</Button>
         </DialogActions>
       </Dialog>
+      <ConfirmDialog open={!!confirmId} title="Удалить периодическую операцию?" onConfirm={handleDelete} onCancel={() => setConfirmId(null)} />
     </Box>
   );
 }
