@@ -19,8 +19,8 @@ public class dtos {
     public record CategoryRequest(String name, Category.CategoryType type, String icon) {}
     public record CategoryResponse(Long id, String name, Category.CategoryType type, String icon, LocalDateTime createdAt) {}
 
-    public record TransactionRequest(Long accountId, Long categoryId, Transaction.TransactionType type, BigDecimal amount, String description, LocalDate transactionDate, Long targetAccountId) {}
-    public record TransactionResponse(Long id, Long accountId, String accountName, Long categoryId, String categoryName, Transaction.TransactionType type, BigDecimal amount, String description, LocalDate transactionDate, Long relatedTransactionId, LocalDateTime createdAt) {}
+    public record TransactionRequest(Long accountId, Long categoryId, Transaction.TransactionType type, BigDecimal amount, String description, LocalDate transactionDate) {}
+    public record TransactionResponse(Long id, Long accountId, String accountName, Long categoryId, String categoryName, Transaction.TransactionType type, BigDecimal amount, String description, LocalDate transactionDate, LocalDateTime createdAt) {}
 
     public record BudgetRequest(Long categoryId, BigDecimal amount, Budget.BudgetPeriod period, LocalDate startDate, LocalDate endDate) {}
     public record BudgetResponse(Long id, Long categoryId, String categoryName, BigDecimal amount, BigDecimal spent, BigDecimal remaining, double progressPercent, Budget.BudgetPeriod period, LocalDate startDate, LocalDate endDate) {}

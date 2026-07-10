@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Table(name = "transactions")
 public class Transaction {
     public enum TransactionType {
-        INCOME, EXPENSE, TRANSFER
+        INCOME, EXPENSE
     }
 
     @Id
@@ -41,9 +41,6 @@ public class Transaction {
     @Column(name = "transaction_date", nullable = false)
     private LocalDate transactionDate;
 
-    @Column(name = "related_transaction_id")
-    private Long relatedTransactionId;
-
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -68,8 +65,6 @@ public class Transaction {
     public void setDescription(String description) { this.description = description; }
     public LocalDate getTransactionDate() { return transactionDate; }
     public void setTransactionDate(LocalDate transactionDate) { this.transactionDate = transactionDate; }
-    public Long getRelatedTransactionId() { return relatedTransactionId; }
-    public void setRelatedTransactionId(Long relatedTransactionId) { this.relatedTransactionId = relatedTransactionId; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

@@ -6,7 +6,6 @@ import com.calc.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -62,31 +61,7 @@ public class TransactionService {
             transaction.setCategory(category);
         }
 
-        if (request.type() == Transaction.TransactionType.TRANSFER) {
-            if (request.targetAccountId() == null) {
-                throw new RuntimeException("Target account required for transfer");
-            }
-            Account targetAccount = accountRepository.findById(request.targetAccountId())
-                    .orElseThrow(() -> new RuntimeException("Target account not found"));
-
-            transaction = transactionRepository.save(transaction);
-
-            Transaction targetTransaction = new Transaction();
-            targetTransaction.setUser(user);
-            targetTransaction.setAccount(targetAccount);
-            targetTransaction.setType(Transaction.TransactionType.TRANSFER);
-            targetTransaction.setAmount(request.amount());
-            targetTransaction.setDescription("Transfer from " + account.getName());
-            targetTransaction.setTransactionDate(request.transactionDate());
-            targetTransaction.setRelatedTransactionId(transaction.getId());
-            targetTransaction = transactionRepository.save(targetTransaction);
-
-            transaction.setRelatedTransactionId(targetTransaction.getId());
-            transaction = transactionRepository.save(transaction);
-        } else {
-            transaction = transactionRepository.save(transaction);
-        }
-
+        transaction = transactionRepository.save(transaction);
         return toResponse(transaction);
     }
 
@@ -114,26 +89,6 @@ public class TransactionService {
             transaction.setCategory(null);
         }
 
-        // Update related transfer transaction if it exists
-        if (transaction.getRelatedTransactionId() != null) {
-            Transaction related = transactionRepository.findById(transaction.getRelatedTransactionId()).orElse(null);
-            if (related != null) {
-                related.setAmount(request.amount());
-                related.setTransactionDate(request.transactionDate());
-                transactionRepository.save(related);
-            }
-        }
-
-        // If the original was a transfer and user changed type, clear the relation
-        if (request.type() != Transaction.TransactionType.TRANSFER && transaction.getRelatedTransactionId() != null) {
-            Transaction related = transactionRepository.findById(transaction.getRelatedTransactionId()).orElse(null);
-            if (related != null) {
-                related.setRelatedTransactionId(null);
-                transactionRepository.save(related);
-            }
-            transaction.setRelatedTransactionId(null);
-        }
-
         transaction = transactionRepository.save(transaction);
         return toResponse(transaction);
     }
@@ -145,15 +100,6 @@ public class TransactionService {
         if (!transaction.getUser().getId().equals(userId)) {
             throw new RuntimeException("Access denied");
         }
-        if (transaction.getRelatedTransactionId() != null) {
-            transactionRepository.findById(transaction.getRelatedTransactionId())
-                    .ifPresent(t -> {
-                        if (t.getRelatedTransactionId() != null) {
-                            t.setRelatedTransactionId(null);
-                            transactionRepository.save(t);
-                        }
-                    });
-        }
         transactionRepository.delete(transaction);
     }
 
@@ -163,6 +109,6 @@ public class TransactionService {
                 t.getCategory() != null ? t.getCategory().getId() : null,
                 t.getCategory() != null ? t.getCategory().getName() : null,
                 t.getType(), t.getAmount(), t.getDescription(),
-                t.getTransactionDate(), t.getRelatedTransactionId(), t.getCreatedAt());
+                t.getTransactionDate(), t.getCreatedAt());
     }
 }
