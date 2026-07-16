@@ -48,7 +48,7 @@ export function todayISO() {
 
 export function getErrorMessage(error) {
   return error?.response?.data?.error
-    || Object.values(error?.response?.data || {})[0]
+    || Object.values(error?.response?.data?.message || {})
     || error?.message
     || 'Произошла ошибка';
 }

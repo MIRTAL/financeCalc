@@ -20,4 +20,4 @@ spring:
 app:
   jwt:
     secret: finance-calc-secret-key-change-in-production
-    expiration-ms: 86400000
+    expiration-ms: 3600000

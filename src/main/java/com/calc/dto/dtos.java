@@ -12,6 +12,7 @@ public class dtos {
     public record RegisterRequest(String username, String password, String email) {}
     public record AuthRequest(String username, String password) {}
     public record AuthResponse(String token, Long userId, String username) {}
+    public record ErrorResponse(int status, String message, String description) {}
 
     public record AccountRequest(String name, Account.AccountType type, BigDecimal initialBalance, String currency) {}
     public record AccountResponse(Long id, String name, Account.AccountType type, BigDecimal initialBalance, String currency, BigDecimal currentBalance, LocalDateTime createdAt) {}
