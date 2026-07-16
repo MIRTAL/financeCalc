@@ -1,7 +1,7 @@
 -- Database initialization script for Finance Calculator
 -- Run this manually if you prefer not to use Hibernate ddl-auto
 
-CREATE DATABASE finance_calc;
+--CREATE DATABASE finance_calc;
 
 \c finance_calc;
 

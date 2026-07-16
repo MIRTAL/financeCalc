@@ -1,0 +1,115 @@
+#!/bin/bash
+
+#   NAME-VERSION-PORTS
+
+# POSTGRESQL
+# NAME
+    PG_LOCAL_NAME="postgresql-local"
+    PG_DOCKER_REGISTRY_NAME="postgresql-full"
+# VERSION
+    PG_LOCAL_VERSION="11"
+    PG_DOCKER_REGISTRY_VERSION="11"
+# PORT
+    PG_LOCAL_PORT="5432"
+    PG_DOCKER_PORT="5432"
+
+#   USERS-PASSWORDS-CONNECTIONS
+
+# POSTGRESQL
+    PG_USER="postgres"
+    PG_PSWD="postgres"
+    PG_MAX_CONNECTIONS="1000"
+
+#   DOCKER-BASE-IMAGE-NAME
+
+# POSTGRESQL
+    PG_BASE_IMAGE_NAME="postgresql"
+
+#   DOCKER-URL
+    REGISTRY_URL="oais-registry.oais.by"
+    HOST_DOCKER="192.168.99.100"
+
+#   CONF-JAR-SQL-PATH
+
+# DOCKERIGNORE
+# JAR
+    ACTIVITI_7_JAR_PATH=""'!'"/oais/runtime-app/target/*"
+    WSO2_IS_JAR_PATH=""'!'"/platform/wso2-is/wso2-is-impl/*"
+    CONF_APP_JAR_PATH=""'!'"/oais/conf-app/target/*"
+    ISF_APP_JAR_PATH=""'!'"/isf/isf-app/target/*"
+    RUNTIME_APP_JAR_PATH=""'!'"/oais/runtime-app/target/*"
+    UI_ACCOUNT_BUILD=""'!'"/frontend/packages/oais/account/*"
+    UI_SANDBOX_BUILD=""'!'"/frontend/packages/isf/sandbox/*"
+
+# CONF
+    WSO2_IS_CONF_PATH=""'!'"/platform/wso2-is/wso2-is-conf/*"
+    WSO2_APIM_CONF_PATH=""'!'"/platform/wso2-apim/wso2-apim-conf/*"
+    UI_CONF_PATH=""'!'"/platform/ui/nginx/*"
+    UI_SANDBOX_PATH=""'!'"/frontend/packages/isf/sandbox/*"
+    UI_ACCOUNT_PATH=""'!'"/frontend/packages/oais/account/*"
+    REDIS_CONF_PATH=""'!'"/platform/redis/redis-conf/*"
+    PG_CONF_PATH=""'!'"/platform/postgresql/*"
+    ISF_JKS_PATH=""'!'"/platform/jks/*"
+    ISF_SERVICE_CONF_PATH=""'!'"/services-configurations/*"
+
+# SQL SCRIPTS
+    PG_API_MANAGER_SQL_PATH="platform/postgresql/wso2-apim/*.sql"
+    PG_ACTIVITI_SQL_PATH="platform/postgresql/activiti/*.sql"
+    PG_IDENTITY_SERVER_SQL_PATH="platform/postgresql/wso2-is/*.sql"
+    PG_OAIS_CREATE_SQL_PATH="platform/postgresql/oais/create-db-oais.sql"
+    PG_OAIS_UPDATE_SQL_PATH="platform/postgresql/oais/update-db-oais.sql"
+    PG_OAIS_FUNCTION_SQL_PATH="platform/postgresql/oais/create-function-oais.sql"
+    PG_ADMIN_CONSOLE_SQL_PATH="platform/postgresql/admin-console/create-db.sql"
+
+# BUILD JARS
+    IDENTITY_SERVER_ISF_REST_EXEC_JAR_WITH_DEPENDENCIES_JAR="isf/isf-rest-exec/target/isf-rest-exec-jar-with-dependencies.jar"
+    UI_ACCOUNT_BUILD_PATH="packages/oais/account"
+
+# DOCKERFILE
+    PG_DOCKERFILE_PATH="platform/postgresql/Dockerfile"
+    WSO2_IS_DOCKERFILE_PATH="platform/wso2-is/Dockerfile"
+    API_MANAGER_DOCKERFILE_PATH="platform/wso2-apim/Dockerfile"
+    ACTIVITI_DOCKERFILE_PATH="platform/activiti-dockerfiles/Dockerfile"
+    ELASTICSEARCH_DOCKERGILE_PATH="platform/elasticsearch/Dockerfile"
+    KIBANA_DOCKERGILE_PATH="platform/kibana/Dockerfile"
+    ZOOKEEPER_DOCKERFILE_PATH="platform/zookeeper-kafka/Dockerfile-zookeeper"
+    KAFKA_DOCKERFILE_PATH="platform/zookeeper-kafka/Dockerfile-kafka"
+    REDIS_DOCKERFILE_PATH="platform/redis/Dockerfile"
+    MINIO_DOCKERFILE_PATH="platform/minio/Dockerfile"
+
+# POM
+    ISF_POM="isf/pom.xml"
+
+# PROPERTIS
+    ACTIVITI_ENGINE_PROPERTIES="isf/isf-activiti/isf-activiti-runtime/isf-activiti-engine/src/main/resources/activiti-engine.properties"
+
+
+#   UTILS
+
+# DIR
+    ROOT_DIR=$(pwd)
+    FRONTEND_DIR="frontend"
+
+# DEVELOPER_IP
+    OS=$(uname)
+    DEST_IP=$(ipconfig | grep IPv4 | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}' | grep 172.20.)
+    if [ $OS == 'Linux' ] ; then DEST_IP=$(ifconfig | grep inet | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}' | grep 172.20.11); fi
+
+# HEALTH_CHECK_CONTEXT
+    ACTIVITI_HEALTH_CHECK_CONTEXT="actuator/health"
+    JAVA_ISF_HEALTH_CHECK_CONTEXT="api/actuator/health"
+    MINIO_HEALTH_CHECK_CONTEXT="minio/health/live"
+    ELASTICSEARCH_HEALTH_CHECK_CONTEXT="_cat/health?h=status"
+    KIBANA_HEALTH_CHECK_CONTEXT=""
+
+# WORDS
+    WAIT_CURL_HEALTH="curl_health"
+    WAIT_CURL_CARBON="curl_carbon"
+    WAIT_LOG="log"
+
+    GREEN_COLOR="\e[1;32m"
+    NOCOLOR="\e[0m"
+
+    FRONTEND_DEVLOPER="frontend"
+    BACKEND_DEVELOPER="backend"
+    BUSINESS_ANALYST="business-analyst"
