@@ -87,8 +87,8 @@ export default function BudgetsPage() {
       const promises = Object.entries(distributeAmounts).map(([categoryId, amount]) => {
         const existing = existingBudgets[Number(categoryId)];
         const numAmount = Number(amount) || 0;
-        if (existing) return budgetsApi.update(existing.id, { categoryId: Number(categoryId), amount: numAmount, period: 'MONTHLY', startDate });
-        return budgetsApi.create({ categoryId: Number(categoryId), amount: numAmount, period: 'MONTHLY', startDate });
+        if (existing) return budgetsApi.update(existing.id, { categoryId: Number(categoryId), amount: numAmount, startDate });
+        return budgetsApi.create({ categoryId: Number(categoryId), amount: numAmount, startDate });
       });
       await Promise.all(promises);
       setDistributeOpen(false);
@@ -128,7 +128,6 @@ export default function BudgetsPage() {
               <TableCell>Лимит</TableCell>
               <TableCell>Потрачено</TableCell>
               <TableCell>Разница</TableCell>
-              <TableCell>Период</TableCell>
               <TableCell>Прогресс</TableCell>
             </TableRow>
           </TableHead>
@@ -148,7 +147,6 @@ export default function BudgetsPage() {
                     {item.remaining >= 0 ? '+' : ''}<MoneyDisplay amount={item.remaining} currency={currency} />
                   </Typography>
                 </TableCell>
-                <TableCell>{item.period === 'MONTHLY' ? 'Месяц' : 'Год'}</TableCell>
                 <TableCell sx={{ minWidth: 180 }}>
                   <LinearProgress
                     variant="determinate"

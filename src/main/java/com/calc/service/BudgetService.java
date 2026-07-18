@@ -43,13 +43,7 @@ public class BudgetService {
         LocalDate monthStart = LocalDate.of(year, month, 1);
         LocalDate monthEnd = monthStart.withDayOfMonth(monthStart.lengthOfMonth());
         return budgetRepository.findByUserId(userId).stream()
-                .filter(b -> {
-                    LocalDate bEnd = b.getEndDate() != null ? b.getEndDate() :
-                            b.getPeriod() == Budget.BudgetPeriod.MONTHLY ?
-                                    b.getStartDate().withDayOfMonth(b.getStartDate().lengthOfMonth()) :
-                                    b.getStartDate().withDayOfYear(b.getStartDate().lengthOfYear());
-                    return !b.getStartDate().isAfter(monthEnd) && !bEnd.isBefore(monthStart);
-                })
+                .filter(b -> !b.getStartDate().isAfter(monthEnd) && !b.getStartDate().isBefore(monthStart))
                 .map(this::toResponse).toList();
     }
 
@@ -63,9 +57,7 @@ public class BudgetService {
         budget.setUser(user);
         budget.setCategory(category);
         budget.setAmount(request.amount());
-        budget.setPeriod(request.period());
         budget.setStartDate(request.startDate());
-        budget.setEndDate(request.endDate());
         budget = budgetRepository.save(budget);
         logger.info("User with id = {} create new budget", userId);
         return toResponse(budget);
@@ -83,9 +75,7 @@ public class BudgetService {
                 .orElseThrow(() -> new RuntimeException("Category not found"));
         budget.setCategory(category);
         budget.setAmount(request.amount());
-        budget.setPeriod(request.period());
         budget.setStartDate(request.startDate());
-        budget.setEndDate(request.endDate());
         budget = budgetRepository.save(budget);
         logger.info("User with id = {} update budget with id = {}", userId, id);
         return toResponse(budget);
@@ -105,10 +95,7 @@ public class BudgetService {
 
     private BudgetResponse toResponse(Budget b) {
         LocalDate start = b.getStartDate();
-        LocalDate end = b.getEndDate() != null ? b.getEndDate() :
-                b.getPeriod() == Budget.BudgetPeriod.MONTHLY ?
-                        start.withDayOfMonth(start.lengthOfMonth()) :
-                        start.withDayOfYear(start.lengthOfYear());
+        LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
 
         BigDecimal spent = transactionRepository
                 .sumByUserIdAndTypeAndCategoryAndDateBetween(
@@ -124,6 +111,6 @@ public class BudgetService {
 
         return new BudgetResponse(b.getId(), b.getCategory().getId(),
                 b.getCategory().getName(), b.getAmount(), spent, remaining,
-                Math.min(progress, 100), b.getPeriod(), start, end);
+                Math.min(progress, 100), start);
     }
 }

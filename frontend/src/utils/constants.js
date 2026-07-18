@@ -14,11 +14,6 @@ export const TRANSACTION_TYPES = [
   { value: 'EXPENSE', label: 'Расход' },
 ];
 
-export const BUDGET_PERIODS = [
-  { value: 'MONTHLY', label: 'Месяц' },
-  { value: 'YEARLY', label: 'Год' },
-];
-
 export const RECURRENCE_FREQUENCIES = [
   { value: 'DAILY', label: 'Ежедневно' },
   { value: 'WEEKLY', label: 'Еженедельно' },

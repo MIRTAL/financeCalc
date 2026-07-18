@@ -49,9 +49,7 @@ CREATE TABLE IF NOT EXISTS budgets (
     user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     category_id BIGINT NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
     amount DECIMAL(15,2) NOT NULL,
-    period VARCHAR(10) NOT NULL CHECK (period IN ('MONTHLY', 'YEARLY')),
-    start_date DATE NOT NULL,
-    end_date DATE
+    start_date DATE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS financial_goals (
