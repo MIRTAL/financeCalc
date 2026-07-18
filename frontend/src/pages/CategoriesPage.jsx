@@ -85,7 +85,7 @@ export default function CategoriesPage() {
               <TableRow key={item.id}>
                 <TableCell>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <SvgIcon name={item.icon} folder="category" sx={{ height: '1.2em', width: 'auto' }} />
+                    <SvgIcon name={item.icon} folder="category" sx={{ height: '40px', width: '40px' }} />
                     {item.name}
                   </Box>
                 </TableCell>
@@ -115,7 +115,7 @@ export default function CategoriesPage() {
             <MenuItem value=""><em>Нет</em></MenuItem>
             {ICON_NAMES.map((name) => (
               <MenuItem key={name} value={name} sx={{ display: 'inline-flex', width: '20%', justifyContent: 'center', minHeight: 48 }}>
-                <SvgIcon name={name} folder="category" sx={{ height: '1.5em', width: 'auto' }} />
+                <SvgIcon name={name} folder="category" sx={{ height: '24px', width: '24px' }} />
               </MenuItem>
             ))}
           </TextField>
