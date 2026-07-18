@@ -96,10 +96,12 @@ public class BudgetService {
     private BudgetResponse toResponse(Budget b) {
         LocalDate start = b.getStartDate();
         LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
+        Transaction.TransactionType txType = b.getCategory().getType() == Category.CategoryType.INCOME
+                ? Transaction.TransactionType.INCOME : Transaction.TransactionType.EXPENSE;
 
         BigDecimal spent = transactionRepository
                 .sumByUserIdAndTypeAndCategoryAndDateBetween(
-                        b.getUser().getId(), Transaction.TransactionType.EXPENSE,
+                        b.getUser().getId(), txType,
                         b.getCategory().getId(), start, end);
         if (spent == null) spent = BigDecimal.ZERO;
 

@@ -48,13 +48,11 @@ export default function CategoriesPage() {
       else {
         const res = await categoriesApi.create(payload);
         const cat = res.data;
-        if (cat.type === 'EXPENSE') {
-          const now = new Date();
-          const ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-          const [y, m] = ym.split('-').map(Number);
-          const startDate = `${y}-${String(m).padStart(2, '0')}-01`;
-          await budgetsApi.create({ categoryId: cat.id, amount: 0, startDate });
-        }
+        const now = new Date();
+        const ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        const [y, m] = ym.split('-').map(Number);
+        const startDate = `${y}-${String(m).padStart(2, '0')}-01`;
+        await budgetsApi.create({ categoryId: cat.id, amount: 0, startDate });
       }
       setOpen(false);
       load();
