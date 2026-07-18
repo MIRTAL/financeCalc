@@ -65,7 +65,19 @@ export default function AccountsPage() {
           <TableBody>
             {items.map((item) => (
               <TableRow key={item.id}>
-                <TableCell>{item.name}</TableCell>
+                <TableCell>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    {item.type === 'E_WALLET' ? (
+                      <Box component="img" src="/icons/ewallet.png" alt="ewallet" sx={{ height: 40, width: 40 }} />
+                    ) : (
+                      <SvgIcon
+                        name={item.type === 'BANK_CARD' ? 'credit-card' : 'money-cash'}
+                        sx={{ height: '40px', width: '40px'}}
+                      />
+                    )}
+                    {item.name}
+                  </Box>
+                </TableCell>
                 <TableCell>{ACCOUNT_TYPES.find((t) => t.value === item.type)?.label}</TableCell>
                 <TableCell><MoneyDisplay amount={item.currentBalance} currency={item.currency} /></TableCell>
                 <TableCell>{item.currency}</TableCell>

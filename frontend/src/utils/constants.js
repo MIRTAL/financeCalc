@@ -1,7 +1,6 @@
 export const ACCOUNT_TYPES = [
   { value: 'CASH', label: 'Наличные' },
   { value: 'BANK_CARD', label: 'Банковская карта' },
-  { value: 'DEPOSIT', label: 'Депозит' },
   { value: 'E_WALLET', label: 'Электронный кошелёк' },
 ];
 

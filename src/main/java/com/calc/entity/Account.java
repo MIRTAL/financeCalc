@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Table(name = "accounts")
 public class Account {
     public enum AccountType {
-        CASH, BANK_CARD, DEPOSIT, E_WALLET
+        CASH, BANK_CARD, E_WALLET
     }
 
     @Id

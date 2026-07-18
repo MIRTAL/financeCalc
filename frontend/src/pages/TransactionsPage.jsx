@@ -110,7 +110,19 @@ export default function TransactionsPage() {
                     size="small"
                   />
                 </TableCell>
-                <TableCell>{item.accountName}</TableCell>
+                <TableCell>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    {(() => {
+                      const acc = accounts.find((a) => a.id === item.accountId);
+                      return acc?.type === 'E_WALLET' ? (
+                        <Box component="img" src="/icons/ewallet.png" alt="ewallet" sx={{ height: 40, width: 40 }} />
+                      ) : (
+                        <SvgIcon name={acc?.type === 'BANK_CARD' ? 'credit-card' : 'money-cash'} sx={{ height: '40px', width: '40px' }} />
+                      );
+                    })()}
+                    {item.accountName}
+                  </Box>
+                </TableCell>
                 <TableCell>
                   {item.categoryId ? (
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
