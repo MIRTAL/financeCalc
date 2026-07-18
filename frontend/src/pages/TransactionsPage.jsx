@@ -150,10 +150,28 @@ export default function TransactionsPage() {
             {TRANSACTION_TYPES.map((t) => <MenuItem key={t.value} value={t.value}>{t.label}</MenuItem>)}
           </TextField>
           <TextField fullWidth select label="Счёт" margin="normal" value={form.accountId} onChange={(e) => setForm({ ...form, accountId: e.target.value })}>
-            {accounts.map((a) => <MenuItem key={a.id} value={a.id}>{a.name}</MenuItem>)}
+            {accounts.map((a) => (
+              <MenuItem key={a.id} value={a.id}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  {a.type === 'E_WALLET' ? (
+                    <Box component="img" src="/icons/ewallet.png" alt="ewallet" sx={{ height: 20, width: 20 }} />
+                  ) : (
+                    <SvgIcon name={a.type === 'BANK_CARD' ? 'credit-card' : 'money-cash'} sx={{ height: '20px', width: '20px' }} />
+                  )}
+                  {a.name}
+                </Box>
+              </MenuItem>
+            ))}
           </TextField>
           <TextField fullWidth select label="Категория" margin="normal" value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })}>
-            {filteredCategories.map((c) => <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>)}
+            {filteredCategories.map((c) => (
+              <MenuItem key={c.id} value={c.id}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <SvgIcon name={c.icon} folder="category" sx={{ height: '20px', width: '20px' }} />
+                  {c.name}
+                </Box>
+              </MenuItem>
+            ))}
           </TextField>
           <TextField fullWidth label="Сумма" type="number" margin="normal" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} />
           <TextField fullWidth label="Дата" type="date" margin="normal" InputLabelProps={{ shrink: true }} value={form.transactionDate} onChange={(e) => setForm({ ...form, transactionDate: e.target.value })} />
