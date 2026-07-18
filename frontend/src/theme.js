@@ -29,6 +29,11 @@ const theme = createTheme({
         root: { textTransform: 'none', fontWeight: 600 },
       },
     },
+    MuiTableCell: {
+      styleOverrides: {
+        root: { fontSize: '1rem', fontWeight: 500 },
+      },
+    },
   },
 });
 

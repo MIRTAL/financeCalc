@@ -111,7 +111,14 @@ export default function TransactionsPage() {
                   />
                 </TableCell>
                 <TableCell>{item.accountName}</TableCell>
-                <TableCell>{item.categoryName || '—'}</TableCell>
+                <TableCell>
+                  {item.categoryId ? (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <SvgIcon name={categories.find((c) => c.id === item.categoryId)?.icon} folder="category" sx={{ height: '40px', width: '40px' }} />
+                      {item.categoryName}
+                    </Box>
+                  ) : '—'}
+                </TableCell>
                 <TableCell><MoneyDisplay amount={item.amount} currency={currency} /></TableCell>
                 <TableCell>{item.description || '—'}</TableCell>
                 <TableCell align="right">
