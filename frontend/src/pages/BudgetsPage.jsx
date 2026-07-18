@@ -39,11 +39,13 @@ export default function BudgetsPage() {
   const [tab, setTab] = useState(0);
 
   const catType = tab === 0 ? 'INCOME' : 'EXPENSE';
-  const filteredItems = items.filter((item) => {
-    const cat = allCategories.find((c) => c.id === item.categoryId);
-    return cat?.type === catType;
-  });
-  const filteredCats = categories.filter((c) => c.type === catType);
+  const filteredItems = items
+    .filter((item) => {
+      const cat = allCategories.find((c) => c.id === item.categoryId);
+      return cat?.type === catType;
+    })
+    .sort((a, b) => a.categoryName.localeCompare(b.categoryName));
+  const filteredCats = categories.filter((c) => c.type === catType).sort((a, b) => a.name.localeCompare(b.name));
 
   const load = async () => {
     try {
@@ -200,6 +202,24 @@ export default function BudgetsPage() {
               />
             </Box>
           ))}
+          {tab === 1 && (() => {
+            const incomeTotal = allCategories
+              .filter((c) => c.type === 'INCOME')
+              .reduce((sum, cat) => sum + Number(existingBudgets[cat.id]?.amount || 0), 0);
+            const expenseSum = Object.entries(distributeAmounts)
+              .reduce((sum, [, amount]) => sum + (Number(amount) || 0), 0);
+            const remaining = incomeTotal - expenseSum;
+            return (
+              <Box display="flex" justifyContent="flex-end" mt={3} pt={2} borderTop="1px solid" borderColor="divider">
+                <Typography fontWeight={600}>
+                  Остаток: <Typography component="span" color={remaining >= 0 ? 'success.main' : 'error.main'} fontWeight={700}>
+                    <MoneyDisplay amount={Math.abs(remaining)} currency={currency} />
+                    {remaining < 0 ? ' (превышение)' : ''}
+                  </Typography>
+                </Typography>
+              </Box>
+            );
+          })()}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDistributeOpen(false)}>Отмена</Button>
