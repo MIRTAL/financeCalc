@@ -22,8 +22,15 @@ public class BudgetController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BudgetResponse>> getAll(Authentication auth) {
-        return ResponseEntity.ok(budgetService.getUserBudgets(securityUtil.getCurrentUserId(auth)));
+    public ResponseEntity<List<BudgetResponse>> getAll(
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer month,
+            Authentication auth) {
+        Long userId = securityUtil.getCurrentUserId(auth);
+        if (year != null && month != null) {
+            return ResponseEntity.ok(budgetService.getUserBudgetsByMonth(userId, year, month));
+        }
+        return ResponseEntity.ok(budgetService.getUserBudgets(userId));
     }
 
     @PostMapping

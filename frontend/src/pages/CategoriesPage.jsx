@@ -3,7 +3,7 @@ import {
   IconButton, MenuItem, Table, TableBody, TableCell, TableHead, TableRow, Tabs, Tab, TextField, Typography,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { categoriesApi } from '../api/services';
+import { categoriesApi, budgetsApi } from '../api/services';
 
 import SvgIcon from '../utils/SvgIcon';
 import ConfirmDialog from '../components/ConfirmDialog';
@@ -45,7 +45,17 @@ export default function CategoriesPage() {
     try {
       const payload = { ...form };
       if (editId) await categoriesApi.update(editId, payload);
-      else await categoriesApi.create(payload);
+      else {
+        const res = await categoriesApi.create(payload);
+        const cat = res.data;
+        if (cat.type === 'EXPENSE') {
+          const now = new Date();
+          const ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+          const [y, m] = ym.split('-').map(Number);
+          const startDate = `${y}-${String(m).padStart(2, '0')}-01`;
+          await budgetsApi.create({ categoryId: cat.id, amount: 0, period: 'MONTHLY', startDate });
+        }
+      }
       setOpen(false);
       load();
     } catch (e) { setError(getErrorMessage(e)); }

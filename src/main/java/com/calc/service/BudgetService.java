@@ -38,6 +38,21 @@ public class BudgetService {
                 .map(this::toResponse).toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<BudgetResponse> getUserBudgetsByMonth(Long userId, int year, int month) {
+        LocalDate monthStart = LocalDate.of(year, month, 1);
+        LocalDate monthEnd = monthStart.withDayOfMonth(monthStart.lengthOfMonth());
+        return budgetRepository.findByUserId(userId).stream()
+                .filter(b -> {
+                    LocalDate bEnd = b.getEndDate() != null ? b.getEndDate() :
+                            b.getPeriod() == Budget.BudgetPeriod.MONTHLY ?
+                                    b.getStartDate().withDayOfMonth(b.getStartDate().lengthOfMonth()) :
+                                    b.getStartDate().withDayOfYear(b.getStartDate().lengthOfYear());
+                    return !b.getStartDate().isAfter(monthEnd) && !bEnd.isBefore(monthStart);
+                })
+                .map(this::toResponse).toList();
+    }
+
     @Transactional
     public BudgetResponse createBudget(Long userId, BudgetRequest request) {
         User user = userRepository.findById(userId)
@@ -105,7 +120,7 @@ public class BudgetService {
         double progress = b.getAmount().compareTo(BigDecimal.ZERO) > 0 ?
                 spent.multiply(BigDecimal.valueOf(100))
                         .divide(b.getAmount(), 2, java.math.RoundingMode.HALF_UP)
-                        .doubleValue() : 0;
+                        .doubleValue() : 100;
 
         return new BudgetResponse(b.getId(), b.getCategory().getId(),
                 b.getCategory().getName(), b.getAmount(), spent, remaining,
