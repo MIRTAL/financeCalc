@@ -66,7 +66,12 @@ export default function BudgetsPage() {
           <TableBody>
             {items.map((item) => (
               <TableRow key={item.id}>
-                <TableCell>{item.categoryName}</TableCell>
+                <TableCell>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <SvgIcon name={categories.find((c) => c.id === item.categoryId)?.icon} folder="category" sx={{ height: '40px', width: '40px' }} />
+                    {item.categoryName}
+                  </Box>
+                </TableCell>
                 <TableCell><MoneyDisplay amount={item.amount} currency={currency} /></TableCell>
                 <TableCell><MoneyDisplay amount={item.spent} currency={currency} /></TableCell>
                 <TableCell>{item.period === 'MONTHLY' ? 'Месяц' : 'Год'}</TableCell>
@@ -91,7 +96,14 @@ export default function BudgetsPage() {
         <DialogTitle>Новый бюджет</DialogTitle>
         <DialogContent>
           <TextField fullWidth select label="Категория" margin="normal" value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })}>
-            {categories.map((c) => <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>)}
+            {categories.map((c) => (
+              <MenuItem key={c.id} value={c.id}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <SvgIcon name={c.icon} folder="category" sx={{ height: '20px', width: '20px' }} />
+                  {c.name}
+                </Box>
+              </MenuItem>
+            ))}
           </TextField>
           <TextField fullWidth label="Сумма" type="number" margin="normal" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} />
           <TextField fullWidth select label="Период" margin="normal" value={form.period} onChange={(e) => setForm({ ...form, period: e.target.value })}>
