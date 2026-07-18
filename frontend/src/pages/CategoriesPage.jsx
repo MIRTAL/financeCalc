@@ -135,7 +135,7 @@ export default function CategoriesPage() {
           <Button variant="contained" onClick={handleSave}>Сохранить</Button>
         </DialogActions>
       </Dialog>
-      <ConfirmDialog open={!!confirmId} title="Удалить категорию?" onConfirm={handleDelete} onCancel={() => setConfirmId(null)} />
+      <ConfirmDialog open={!!confirmId} title="Удалить категорию?" message="Все связанные транзакции также будут удалены." onConfirm={handleDelete} onCancel={() => setConfirmId(null)} />
     </Box>
   );
 }

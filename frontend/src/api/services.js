@@ -30,7 +30,6 @@ export const budgetsApi = {
   list: (params) => api.get('/budgets', { params }),
   create: (data) => api.post('/budgets', data),
   update: (id, data) => api.put(`/budgets/${id}`, data),
-  remove: (id) => api.delete(`/budgets/${id}`),
 };
 
 export const goalsApi = {
