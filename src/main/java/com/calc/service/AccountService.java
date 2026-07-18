@@ -7,6 +7,8 @@ import com.calc.entity.User;
 import com.calc.repository.AccountRepository;
 import com.calc.repository.TransactionRepository;
 import com.calc.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +17,8 @@ import java.util.List;
 
 @Service
 public class AccountService {
+
+    private static final Logger logger = LoggerFactory.getLogger(AccountService.class);
 
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
@@ -45,6 +49,7 @@ public class AccountService {
         account.setInitialBalance(request.initialBalance());
         account.setCurrency(request.currency());
         account = accountRepository.save(account);
+        logger.info("User with id = {} create new account", userId);
         return toResponse(account);
     }
 
@@ -53,6 +58,7 @@ public class AccountService {
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
         if (!account.getUser().getId().equals(userId)) {
+            logger.warn("User with id {} trying to update not his account with id = {}", userId, id);
             throw new RuntimeException("Access denied");
         }
         account.setName(request.name());
@@ -60,6 +66,7 @@ public class AccountService {
         account.setInitialBalance(request.initialBalance());
         account.setCurrency(request.currency());
         account = accountRepository.save(account);
+        logger.info("User with id = {} update account with id = {}", userId, id);
         return toResponse(account);
     }
 
@@ -68,9 +75,11 @@ public class AccountService {
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
         if (!account.getUser().getId().equals(userId)) {
+            logger.warn("User with id {} trying to delete not his account with id = {}", userId, id);
             throw new RuntimeException("Access denied");
         }
         accountRepository.delete(account);
+        logger.info("User with id = {} successfully deleted account with id = {}", userId, id);
     }
 
     @Transactional(readOnly = true)
@@ -78,6 +87,7 @@ public class AccountService {
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
         if (!account.getUser().getId().equals(userId)) {
+            logger.warn("User with id {} trying to get not his account with id = {}", userId, id);
             throw new RuntimeException("Access denied");
         }
         return toResponse(account);

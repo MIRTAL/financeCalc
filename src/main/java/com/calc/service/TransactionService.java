@@ -3,6 +3,8 @@ package com.calc.service;
 import com.calc.dto.dtos.*;
 import com.calc.entity.*;
 import com.calc.repository.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,6 +13,8 @@ import java.util.List;
 
 @Service
 public class TransactionService {
+
+    private static final Logger logger = LoggerFactory.getLogger(TransactionService.class);
 
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
@@ -70,6 +74,7 @@ public class TransactionService {
         Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Transaction not found"));
         if (!transaction.getUser().getId().equals(userId)) {
+            logger.warn("User with id {} trying to update not his transaction with id = {}", userId, id);
             throw new RuntimeException("Access denied");
         }
 
@@ -98,6 +103,7 @@ public class TransactionService {
         Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Transaction not found"));
         if (!transaction.getUser().getId().equals(userId)) {
+            logger.warn("User with id {} trying to delete not his transaction with id = {}", userId, id);
             throw new RuntimeException("Access denied");
         }
         transactionRepository.delete(transaction);

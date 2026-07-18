@@ -3,6 +3,8 @@ package com.calc.service;
 import com.calc.dto.dtos.*;
 import com.calc.entity.*;
 import com.calc.repository.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,6 +13,8 @@ import java.util.List;
 
 @Service
 public class GoalService {
+
+    private static final Logger logger = LoggerFactory.getLogger(GoalService.class);
 
     private final FinancialGoalRepository goalRepository;
     private final CategoryRepository categoryRepository;
@@ -46,6 +50,7 @@ public class GoalService {
             goal.setCategory(category);
         }
         goal = goalRepository.save(goal);
+        logger.info("User with id = {} create new goal", userId);
         return toResponse(goal);
     }
 
@@ -54,6 +59,7 @@ public class GoalService {
         FinancialGoal goal = goalRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Goal not found"));
         if (!goal.getUser().getId().equals(userId)) {
+            logger.warn("User with id {} trying to update not his goal with id = {}", userId, id);
             throw new RuntimeException("Access denied");
         }
         goal.setName(request.name());
@@ -68,6 +74,7 @@ public class GoalService {
             goal.setCategory(null);
         }
         goal = goalRepository.save(goal);
+        logger.info("User with id = {} update goal with id = {}", userId, id);
         return toResponse(goal);
     }
 
@@ -76,9 +83,11 @@ public class GoalService {
         FinancialGoal goal = goalRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Goal not found"));
         if (!goal.getUser().getId().equals(userId)) {
+            logger.warn("User with id {} trying to delete not his goal with id = {}", userId, id);
             throw new RuntimeException("Access denied");
         }
         goalRepository.delete(goal);
+        logger.info("User with id = {} successfully deleted goal with id = {}", userId, id);
     }
 
     @Transactional
@@ -86,10 +95,12 @@ public class GoalService {
         FinancialGoal goal = goalRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Goal not found"));
         if (!goal.getUser().getId().equals(userId)) {
+            logger.warn("User with id {} trying to delete not his account with id = {}", userId, id);
             throw new RuntimeException("Access denied");
         }
         goal.setCurrentAmount(goal.getCurrentAmount().add(amount));
         goal = goalRepository.save(goal);
+        logger.info("User with id = {} successfully deposit goal with id = {}", userId, id);
         return toResponse(goal);
     }
 

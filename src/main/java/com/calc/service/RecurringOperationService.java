@@ -3,6 +3,8 @@ package com.calc.service;
 import com.calc.dto.dtos.*;
 import com.calc.entity.*;
 import com.calc.repository.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +14,8 @@ import java.util.List;
 
 @Service
 public class RecurringOperationService {
+
+    private static final Logger logger = LoggerFactory.getLogger(RecurringOperationService.class);
 
     private final RecurringOperationRepository recurringRepository;
     private final AccountRepository accountRepository;

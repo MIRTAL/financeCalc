@@ -3,6 +3,8 @@ package com.calc.service;
 import com.calc.dto.dtos.*;
 import com.calc.entity.*;
 import com.calc.repository.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +14,8 @@ import java.util.List;
 
 @Service
 public class BudgetService {
+
+    private static final Logger logger = LoggerFactory.getLogger(BudgetService.class);
 
     private final BudgetRepository budgetRepository;
     private final TransactionRepository transactionRepository;
@@ -48,6 +52,7 @@ public class BudgetService {
         budget.setStartDate(request.startDate());
         budget.setEndDate(request.endDate());
         budget = budgetRepository.save(budget);
+        logger.info("User with id = {} create new budget", userId);
         return toResponse(budget);
     }
 
@@ -56,6 +61,7 @@ public class BudgetService {
         Budget budget = budgetRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Budget not found"));
         if (!budget.getUser().getId().equals(userId)) {
+            logger.warn("User with id {} trying to update not his budget with id = {}", userId, id);
             throw new RuntimeException("Access denied");
         }
         Category category = categoryRepository.findById(request.categoryId())
@@ -66,6 +72,7 @@ public class BudgetService {
         budget.setStartDate(request.startDate());
         budget.setEndDate(request.endDate());
         budget = budgetRepository.save(budget);
+        logger.info("User with id = {} update budget with id = {}", userId, id);
         return toResponse(budget);
     }
 
@@ -74,9 +81,11 @@ public class BudgetService {
         Budget budget = budgetRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Budget not found"));
         if (!budget.getUser().getId().equals(userId)) {
+            logger.warn("User with id {} trying to delete not his budget with id = {}", userId, id);
             throw new RuntimeException("Access denied");
         }
         budgetRepository.delete(budget);
+        logger.info("User with id = {} successfully deleted budget with id = {}", userId, id);
     }
 
     private BudgetResponse toResponse(Budget b) {

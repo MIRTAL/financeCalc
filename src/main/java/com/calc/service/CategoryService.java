@@ -5,6 +5,8 @@ import com.calc.entity.Category;
 import com.calc.entity.User;
 import com.calc.repository.CategoryRepository;
 import com.calc.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +14,8 @@ import java.util.List;
 
 @Service
 public class CategoryService {
+
+    private static final Logger logger = LoggerFactory.getLogger(CategoryService.class);
 
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
@@ -39,6 +43,7 @@ public class CategoryService {
         category.setType(request.type());
         category.setIcon(request.icon());
         category = categoryRepository.save(category);
+        logger.info("User with id = {} create new category", userId);
         return toResponse(category);
     }
 
@@ -47,12 +52,14 @@ public class CategoryService {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found"));
         if (!category.getUser().getId().equals(userId)) {
+            logger.warn("User with id {} trying to update not his category with id = {}", userId, id);
             throw new RuntimeException("Access denied");
         }
         category.setName(request.name());
         category.setType(request.type());
         category.setIcon(request.icon());
         category = categoryRepository.save(category);
+        logger.info("User with id = {} update category with id = {}", userId, id);
         return toResponse(category);
     }
 
@@ -61,9 +68,11 @@ public class CategoryService {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found"));
         if (!category.getUser().getId().equals(userId)) {
+            logger.warn("User with id {} trying to delete not his category with id = {}", userId, id);
             throw new RuntimeException("Access denied");
         }
         categoryRepository.delete(category);
+        logger.info("User with id = {} successfully deleted category with id = {}", userId, id);
     }
 
     private CategoryResponse toResponse(Category c) {
