@@ -1,6 +1,6 @@
 import {
   Alert, Box, Button, Card, Chip, Dialog, DialogActions, DialogContent, DialogTitle,
-  IconButton, MenuItem, Table, TableBody, TableCell, TableHead, TableRow, Tabs, Tab, TextField, Typography,
+  IconButton, MenuItem, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { categoriesApi, budgetsApi } from '../api/services';
@@ -23,26 +23,30 @@ export default function CategoriesPage() {
   const [editId, setEditId] = useState(null);
   const [open, setOpen] = useState(false);
   const [error, setError] = useState('');
-  const [filter, setFilter] = useState(0);
   const [confirmId, setConfirmId] = useState(null);
-  const [sortAsc, setSortAsc] = useState(true);
+  const [filter, setFilter] = useState('ALL');
+  const [nameError, setNameError] = useState(false);
 
-  const filtered = filter === 0 ? items : items.filter((c) => c.type === (filter === 1 ? 'INCOME' : 'EXPENSE'));
-  const sorted = [...filtered].sort((a, b) => sortAsc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
+  const filtered = filter === 'ALL' ? items : items.filter((c) => c.type === filter);
+  const sorted = [...filtered].sort((a, b) => a.name.localeCompare(b.name));
 
   const load = () => categoriesApi.list().then((r) => setItems(r.data)).catch((e) => setError(getErrorMessage(e)));
   useEffect(() => { load(); }, []);
 
 
-  const openCreate = () => { setEditId(null); setForm(emptyForm); setOpen(true); };
+  const openCreate = () => { setEditId(null); setForm(emptyForm); setError(''); setNameError(false); setOpen(true); };
   const openEdit = (item) => {
     setEditId(item.id);
     setForm({ name: item.name, type: item.type, icon: item.icon || '' });
+    setError('');
+    setNameError(false);
     setOpen(true);
   };
 
   const handleSave = async () => {
     try {
+      if (!form.name.trim()) { setNameError(true); return; }
+      setNameError(false);
       const payload = { ...form };
       if (editId) await categoriesApi.update(editId, payload);
       else {
@@ -67,23 +71,21 @@ export default function CategoriesPage() {
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h4">Категории</Typography>
-        <Button variant="contained" startIcon={<SvgIcon name="Add" />} onClick={openCreate}>Добавить</Button>
       </Box>
       {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}
-      <Tabs value={filter} onChange={(_, v) => setFilter(v)} sx={{ mb: 1 }}>
-        <Tab label="Все категории" />
-        <Tab label="Категории доходов" />
-        <Tab label="Категории расходов" />
-      </Tabs>
+      <Box display="flex" gap={2} alignItems="center" mb={1}>
+        <TextField select size="small" value={filter} onChange={(e) => setFilter(e.target.value)} sx={{ minWidth: 200 }}>
+          <MenuItem value="ALL">Все категории</MenuItem>
+          <MenuItem value="INCOME">Доходы</MenuItem>
+          <MenuItem value="EXPENSE">Расходы</MenuItem>
+        </TextField>
+        <Button variant="contained" startIcon={<SvgIcon name="Add" />} onClick={openCreate} sx={{ ml: 'auto' }}>Добавить</Button>
+      </Box>
       <Card>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>
-                <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, cursor: 'pointer' }} onClick={() => setSortAsc(!sortAsc)}>
-                  Название <SvgIcon name={sortAsc ? 'ArrowUp' : 'ArrowDown'} sx={{ height: '1em', width: 'auto', opacity: 0.5 }} />
-                </Box>
-              </TableCell>
+              <TableCell>Название</TableCell>
               <TableCell>Тип</TableCell>
               <TableCell align="right">Действия</TableCell>
             </TableRow>
@@ -113,7 +115,7 @@ export default function CategoriesPage() {
       <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
         <DialogTitle>{editId ? 'Редактировать категорию' : 'Новая категория'}</DialogTitle>
         <DialogContent>
-          <TextField fullWidth label="Название" margin="normal" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+          <TextField fullWidth label="Название" margin="normal" required error={nameError} helperText={nameError ? 'Название обязательно' : ''} value={form.name} onChange={(e) => { setForm({ ...form, name: e.target.value }); if (nameError) setNameError(false); }} />
           <TextField fullWidth select label="Тип" margin="normal" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}>
             {CATEGORY_TYPES.map((t) => <MenuItem key={t.value} value={t.value}>{t.label}</MenuItem>)}
           </TextField>
