@@ -150,7 +150,7 @@ export default function TransactionsPage() {
             {TRANSACTION_TYPES.map((t) => <MenuItem key={t.value} value={t.value}>{t.label}</MenuItem>)}
           </TextField>
           <TextField fullWidth select label="Счёт" margin="normal" value={form.accountId} onChange={(e) => setForm({ ...form, accountId: e.target.value })}>
-            {accounts.map((a) => (
+            {accounts.filter((a) => a.type !== 'MONEY_BOX').map((a) => (
               <MenuItem key={a.id} value={a.id}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   {a.type === 'E_WALLET' ? (

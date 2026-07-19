@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -17,15 +18,18 @@ public class GoalService {
     private static final Logger logger = LoggerFactory.getLogger(GoalService.class);
 
     private final FinancialGoalRepository goalRepository;
-    private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+    private final AccountRepository accountRepository;
+    private final TransactionRepository transactionRepository;
 
     public GoalService(FinancialGoalRepository goalRepository,
-                       CategoryRepository categoryRepository,
-                       UserRepository userRepository) {
+                       UserRepository userRepository,
+                       AccountRepository accountRepository,
+                       TransactionRepository transactionRepository) {
         this.goalRepository = goalRepository;
-        this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
+        this.accountRepository = accountRepository;
+        this.transactionRepository = transactionRepository;
     }
 
     @Transactional(readOnly = true)
@@ -38,17 +42,13 @@ public class GoalService {
     public GoalResponse createGoal(Long userId, GoalRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
         FinancialGoal goal = new FinancialGoal();
         goal.setUser(user);
         goal.setName(request.name());
         goal.setTargetAmount(request.targetAmount());
-        goal.setCurrentAmount(request.currentAmount() != null ? request.currentAmount() : BigDecimal.ZERO);
+        goal.setCurrentAmount(BigDecimal.ZERO);
         goal.setTargetDate(request.targetDate());
-        if (request.categoryId() != null) {
-            Category category = categoryRepository.findById(request.categoryId())
-                    .orElseThrow(() -> new RuntimeException("Category not found"));
-            goal.setCategory(category);
-        }
         goal = goalRepository.save(goal);
         logger.info("User with id = {} create new goal", userId);
         return toResponse(goal);
@@ -64,15 +64,8 @@ public class GoalService {
         }
         goal.setName(request.name());
         goal.setTargetAmount(request.targetAmount());
-        goal.setCurrentAmount(request.currentAmount());
         goal.setTargetDate(request.targetDate());
-        if (request.categoryId() != null) {
-            Category category = categoryRepository.findById(request.categoryId())
-                    .orElseThrow(() -> new RuntimeException("Category not found"));
-            goal.setCategory(category);
-        } else {
-            goal.setCategory(null);
-        }
+        goal.setCategory(null);
         goal = goalRepository.save(goal);
         logger.info("User with id = {} update goal with id = {}", userId, id);
         return toResponse(goal);
@@ -91,7 +84,7 @@ public class GoalService {
     }
 
     @Transactional
-    public GoalResponse addToGoal(Long id, Long userId, BigDecimal amount) {
+    public GoalResponse addToGoal(Long id, Long userId, BigDecimal amount, Long accountId) {
         FinancialGoal goal = goalRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Goal not found"));
         if (!goal.getUser().getId().equals(userId)) {
@@ -100,7 +93,71 @@ public class GoalService {
         }
         goal.setCurrentAmount(goal.getCurrentAmount().add(amount));
         goal = goalRepository.save(goal);
+
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+        Transaction transaction = new Transaction();
+        transaction.setUser(goal.getUser());
+        transaction.setAccount(account);
+        transaction.setType(Transaction.TransactionType.EXPENSE);
+        transaction.setAmount(amount);
+        transaction.setDescription("Пополнение цели: " + goal.getName());
+        transaction.setTransactionDate(LocalDate.now());
+        transactionRepository.save(transaction);
+
         logger.info("User with id = {} successfully deposit goal with id = {}", userId, id);
+        return toResponse(goal);
+    }
+
+    @Transactional
+    public GoalResponse withdrawFromGoal(Long id, Long userId, BigDecimal amount, Long accountId) {
+        FinancialGoal goal = goalRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Goal not found"));
+        if (!goal.getUser().getId().equals(userId)) {
+            logger.warn("User with id {} trying to withdraw not his goal with id = {}", userId, id);
+            throw new RuntimeException("Access denied");
+        }
+        goal.setCurrentAmount(goal.getCurrentAmount().subtract(amount));
+        goal = goalRepository.save(goal);
+
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+        Transaction transaction = new Transaction();
+        transaction.setUser(goal.getUser());
+        transaction.setAccount(account);
+        transaction.setType(Transaction.TransactionType.INCOME);
+        transaction.setAmount(amount);
+        transaction.setDescription("Снятие с цели: " + goal.getName());
+        transaction.setTransactionDate(LocalDate.now());
+        transactionRepository.save(transaction);
+
+        logger.info("User with id = {} withdrew from goal with id = {}", userId, id);
+        return toResponse(goal);
+    }
+
+    @Transactional
+    public GoalResponse spendFromGoal(Long id, Long userId, BigDecimal amount, Long accountId) {
+        FinancialGoal goal = goalRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Goal not found"));
+        if (!goal.getUser().getId().equals(userId)) {
+            logger.warn("User with id {} trying to spend not his goal with id = {}", userId, id);
+            throw new RuntimeException("Access denied");
+        }
+        goal.setCurrentAmount(goal.getCurrentAmount().subtract(amount));
+        goal = goalRepository.save(goal);
+
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+        Transaction transaction = new Transaction();
+        transaction.setUser(goal.getUser());
+        transaction.setAccount(account);
+        transaction.setType(Transaction.TransactionType.EXPENSE);
+        transaction.setAmount(amount);
+        transaction.setDescription("Трата с цели: " + goal.getName());
+        transaction.setTransactionDate(LocalDate.now());
+        transactionRepository.save(transaction);
+
+        logger.info("User with id = {} spent from goal with id = {}", userId, id);
         return toResponse(goal);
     }
 
@@ -111,8 +168,6 @@ public class GoalService {
                         .doubleValue() : 0;
         return new GoalResponse(g.getId(), g.getName(), g.getTargetAmount(),
                 g.getCurrentAmount(), Math.min(progress, 100), g.getTargetDate(),
-                g.getCategory() != null ? g.getCategory().getId() : null,
-                g.getCategory() != null ? g.getCategory().getName() : null,
                 g.getCreatedAt());
     }
 }

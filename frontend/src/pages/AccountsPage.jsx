@@ -19,7 +19,7 @@ export default function AccountsPage() {
   const [error, setError] = useState('');
   const [confirmId, setConfirmId] = useState(null);
 
-  const load = () => accountsApi.list().then((r) => setItems(r.data)).catch((e) => setError(getErrorMessage(e)));
+  const load = () => accountsApi.list().then((r) => setItems(r.data.filter((a) => a.type !== 'MONEY_BOX'))).catch((e) => setError(getErrorMessage(e)));
 
   useEffect(() => { load(); }, []);
 

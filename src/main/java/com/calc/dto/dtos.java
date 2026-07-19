@@ -26,8 +26,8 @@ public class dtos {
     public record BudgetRequest(Long categoryId, BigDecimal amount, LocalDate startDate) {}
     public record BudgetResponse(Long id, Long categoryId, String categoryName, BigDecimal amount, BigDecimal spent, BigDecimal remaining, double progressPercent, LocalDate startDate) {}
 
-    public record GoalRequest(String name, BigDecimal targetAmount, BigDecimal currentAmount, LocalDate targetDate, Long categoryId) {}
-    public record GoalResponse(Long id, String name, BigDecimal targetAmount, BigDecimal currentAmount, double progressPercent, LocalDate targetDate, Long categoryId, String categoryName, LocalDateTime createdAt) {}
+    public record GoalRequest(String name, BigDecimal targetAmount, LocalDate targetDate) {}
+    public record GoalResponse(Long id, String name, BigDecimal targetAmount, BigDecimal currentAmount, double progressPercent, LocalDate targetDate, LocalDateTime createdAt) {}
 
     public record RecurringRequest(Long accountId, Long categoryId, RecurringOperation.OperationType type, BigDecimal amount, String description, RecurringOperation.Frequency frequency, LocalDate startDate, LocalDate endDate) {}
     public record RecurringResponse(Long id, Long accountId, String accountName, Long categoryId, String categoryName, RecurringOperation.OperationType type, BigDecimal amount, String description, RecurringOperation.Frequency frequency, LocalDate nextDate, LocalDate startDate, LocalDate endDate, boolean active, LocalDateTime createdAt) {}

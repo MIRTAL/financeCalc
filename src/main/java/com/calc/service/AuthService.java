@@ -1,7 +1,9 @@
 package com.calc.service;
 
 import com.calc.dto.dtos.*;
+import com.calc.entity.Account;
 import com.calc.entity.User;
+import com.calc.repository.AccountRepository;
 import com.calc.repository.UserRepository;
 import com.calc.security.JwtUtil;
 import org.slf4j.Logger;
@@ -10,6 +12,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 
 @Service
 public class AuthService {
@@ -17,18 +22,21 @@ public class AuthService {
     private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
     private final UserRepository userRepository;
+    private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authManager;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder,
-                       JwtUtil jwtUtil, AuthenticationManager authManager) {
+    public AuthService(UserRepository userRepository, AccountRepository accountRepository,
+                       PasswordEncoder passwordEncoder, JwtUtil jwtUtil, AuthenticationManager authManager) {
         this.userRepository = userRepository;
+        this.accountRepository = accountRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.authManager = authManager;
     }
 
+    @Transactional
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.username())) {
             logger.error("User with name {} is already exists", request.username());
@@ -43,6 +51,16 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(request.password()));
         user.setEmail(request.email());
         user = userRepository.save(user);
+
+        Account moneyBox = new Account();
+        moneyBox.setUser(user);
+        moneyBox.setName("Копилка");
+        moneyBox.setType(Account.AccountType.MONEY_BOX);
+        moneyBox.setInitialBalance(BigDecimal.ZERO);
+        moneyBox.setCurrency("RUB");
+        accountRepository.save(moneyBox);
+        logger.info("User with id = {} auto-created MONEY_BOX account", user.getId());
+
         String token = jwtUtil.generateToken(user.getUsername());
         logger.info("User was successfully registered with id {}", user.getId());
         return new AuthResponse(token, user.getId(), user.getUsername());

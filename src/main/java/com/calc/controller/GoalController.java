@@ -48,7 +48,24 @@ public class GoalController {
     @PostMapping("/{id}/add")
     public ResponseEntity<GoalResponse> addAmount(@PathVariable Long id,
                                                    @RequestParam BigDecimal amount,
+                                                   @RequestParam Long accountId,
                                                    Authentication auth) {
-        return ResponseEntity.ok(goalService.addToGoal(id, securityUtil.getCurrentUserId(auth), amount));
+        return ResponseEntity.ok(goalService.addToGoal(id, securityUtil.getCurrentUserId(auth), amount, accountId));
+    }
+
+    @PostMapping("/{id}/withdraw")
+    public ResponseEntity<GoalResponse> withdraw(@PathVariable Long id,
+                                                  @RequestParam BigDecimal amount,
+                                                  @RequestParam Long accountId,
+                                                  Authentication auth) {
+        return ResponseEntity.ok(goalService.withdrawFromGoal(id, securityUtil.getCurrentUserId(auth), amount, accountId));
+    }
+
+    @PostMapping("/{id}/spend")
+    public ResponseEntity<GoalResponse> spend(@PathVariable Long id,
+                                               @RequestParam BigDecimal amount,
+                                               @RequestParam Long accountId,
+                                               Authentication auth) {
+        return ResponseEntity.ok(goalService.spendFromGoal(id, securityUtil.getCurrentUserId(auth), amount, accountId));
     }
 }

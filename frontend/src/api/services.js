@@ -36,7 +36,9 @@ export const goalsApi = {
   list: () => api.get('/goals'),
   create: (data) => api.post('/goals', data),
   update: (id, data) => api.put(`/goals/${id}`, data),
-  contribute: (id, amount) => api.post(`/goals/${id}/add`, null, { params: { amount } }),
+  contribute: (id, amount, accountId) => api.post(`/goals/${id}/add`, null, { params: { amount, accountId } }),
+  withdraw: (id, amount, accountId) => api.post(`/goals/${id}/withdraw`, null, { params: { amount, accountId } }),
+  spend: (id, amount, accountId) => api.post(`/goals/${id}/spend`, null, { params: { amount, accountId } }),
   remove: (id) => api.delete(`/goals/${id}`),
 };
 
