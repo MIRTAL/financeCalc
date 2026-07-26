@@ -9,7 +9,7 @@ import MoneyDisplay from '../utils/MoneyDisplay';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { ACCOUNT_TYPES, CURRENCIES, getErrorMessage } from '../utils/constants';
 
-const emptyForm = { name: '', type: 'CASH', initialBalance: '', currency: 'RUB' };
+const emptyForm = { name: '', type: 'CASH', balance: '', currency: 'RUB' };
 
 export default function AccountsPage() {
   const [items, setItems] = useState([]);
@@ -26,13 +26,13 @@ export default function AccountsPage() {
   const openCreate = () => { setEditId(null); setForm(emptyForm); setOpen(true); };
   const openEdit = (item) => {
     setEditId(item.id);
-    setForm({ name: item.name, type: item.type, initialBalance: item.initialBalance, currency: item.currency });
+    setForm({ name: item.name, type: item.type, balance: item.balance, currency: item.currency });
     setOpen(true);
   };
 
   const handleSave = async () => {
     try {
-      const payload = { ...form, initialBalance: Number(form.initialBalance) };
+      const payload = { ...form, balance: Number(form.balance) };
       if (editId) await accountsApi.update(editId, payload);
       else await accountsApi.create(payload);
       setOpen(false);
@@ -99,7 +99,7 @@ export default function AccountsPage() {
             {ACCOUNT_TYPES.map((t) => <MenuItem key={t.value} value={t.value}>{t.label}</MenuItem>)}
           </TextField>
           {!editId && (
-            <TextField fullWidth label="Начальный баланс" type="number" margin="normal" value={form.initialBalance} onChange={(e) => setForm({ ...form, initialBalance: e.target.value })} />
+            <TextField fullWidth label="Начальный баланс" type="number" margin="normal" value={form.balance} onChange={(e) => setForm({ ...form, balance: e.target.value })} />
           )}
           <TextField fullWidth select label="Валюта" margin="normal" value={form.currency} onChange={(e) => setForm({ ...form, currency: e.target.value })}>
             {CURRENCIES.map((c) => <MenuItem key={c} value={c}>{c}</MenuItem>)}

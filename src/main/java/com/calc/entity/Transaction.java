@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Table(name = "transactions")
 public class Transaction {
     public enum TransactionType {
-        INCOME, EXPENSE
+        INCOME, EXPENSE, TRANSFER
     }
 
     @Id

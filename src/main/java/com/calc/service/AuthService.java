@@ -56,7 +56,7 @@ public class AuthService {
         moneyBox.setUser(user);
         moneyBox.setName("Копилка");
         moneyBox.setType(Account.AccountType.MONEY_BOX);
-        moneyBox.setInitialBalance(BigDecimal.ZERO);
+        moneyBox.setBalance(BigDecimal.ZERO);
         moneyBox.setCurrency("RUB");
         accountRepository.save(moneyBox);
         logger.info("User with id = {} auto-created MONEY_BOX account", user.getId());
@@ -75,3 +75,4 @@ public class AuthService {
         return new AuthResponse(token, user.getId(), user.getUsername());
     }
 }
+

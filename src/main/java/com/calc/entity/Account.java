@@ -26,8 +26,8 @@ public class Account {
     @Column(name = "type", nullable = false, length = 20)
     private AccountType type;
 
-    @Column(name = "initial_balance", nullable = false, precision = 15, scale = 2)
-    private BigDecimal initialBalance;
+    @Column(name = "balance", nullable = false, precision = 15, scale = 2)
+    private BigDecimal balance;
 
     @Column(length = 3, nullable = false)
     private String currency;
@@ -48,8 +48,8 @@ public class Account {
     public void setName(String name) { this.name = name; }
     public AccountType getType() { return type; }
     public void setType(AccountType type) { this.type = type; }
-    public BigDecimal getInitialBalance() { return initialBalance; }
-    public void setInitialBalance(BigDecimal initialBalance) { this.initialBalance = initialBalance; }
+    public BigDecimal getBalance() { return balance; }
+    public void setBalance(BigDecimal balance) { this.balance = balance; }
     public String getCurrency() { return currency; }
     public void setCurrency(String currency) { this.currency = currency; }
     public LocalDateTime getCreatedAt() { return createdAt; }

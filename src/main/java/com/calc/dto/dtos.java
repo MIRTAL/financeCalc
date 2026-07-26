@@ -14,8 +14,8 @@ public class dtos {
     public record AuthResponse(String token, Long userId, String username) {}
     public record ErrorResponse(int status, String message, String description) {}
 
-    public record AccountRequest(String name, Account.AccountType type, BigDecimal initialBalance, String currency) {}
-    public record AccountResponse(Long id, String name, Account.AccountType type, BigDecimal initialBalance, String currency, BigDecimal currentBalance, LocalDateTime createdAt) {}
+    public record AccountRequest(String name, Account.AccountType type, BigDecimal balance, String currency) {}
+    public record AccountResponse(Long id, String name, Account.AccountType type, BigDecimal balance, String currency, BigDecimal currentBalance, LocalDateTime createdAt) {}
 
     public record CategoryRequest(String name, Category.CategoryType type, String icon) {}
     public record CategoryResponse(Long id, String name, Category.CategoryType type, String icon, LocalDateTime createdAt) {}

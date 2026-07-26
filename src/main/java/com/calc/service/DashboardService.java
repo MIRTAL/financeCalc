@@ -61,7 +61,7 @@ public class DashboardService {
                             userId, Transaction.TransactionType.EXPENSE,
                             LocalDate.of(1900, 1, 1), LocalDate.of(2100, 1, 1)))
                     .orElse(BigDecimal.ZERO);
-            totalBalance = totalBalance.add(acc.getInitialBalance()).add(accIncome).subtract(accExpense);
+            totalBalance = totalBalance.add(acc.getBalance()).add(accIncome).subtract(accExpense);
         }
 
         List<Object[]> categoryData = transactionRepository.sumGroupByCategory(

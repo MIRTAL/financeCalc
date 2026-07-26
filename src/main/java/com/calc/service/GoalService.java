@@ -94,16 +94,17 @@ public class GoalService {
         goal.setCurrentAmount(goal.getCurrentAmount().add(amount));
         goal = goalRepository.save(goal);
 
-        Account account = accountRepository.findById(accountId)
+        Account sourceAccount = accountRepository.findById(accountId)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
-        Transaction transaction = new Transaction();
-        transaction.setUser(goal.getUser());
-        transaction.setAccount(account);
-        transaction.setType(Transaction.TransactionType.EXPENSE);
-        transaction.setAmount(amount);
-        transaction.setDescription("Пополнение цели: " + goal.getName());
-        transaction.setTransactionDate(LocalDate.now());
-        transactionRepository.save(transaction);
+
+        Transaction debit = new Transaction();
+        debit.setUser(goal.getUser());
+        debit.setAccount(sourceAccount);
+        debit.setType(Transaction.TransactionType.TRANSFER);
+        debit.setAmount(amount);
+        debit.setDescription("Пополнение цели: " + goal.getName());
+        debit.setTransactionDate(LocalDate.now());
+        transactionRepository.save(debit);
 
         logger.info("User with id = {} successfully deposit goal with id = {}", userId, id);
         return toResponse(goal);

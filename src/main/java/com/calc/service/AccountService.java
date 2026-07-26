@@ -2,10 +2,8 @@ package com.calc.service;
 
 import com.calc.dto.dtos.*;
 import com.calc.entity.Account;
-import com.calc.entity.Transaction;
 import com.calc.entity.User;
 import com.calc.repository.AccountRepository;
-import com.calc.repository.TransactionRepository;
 import com.calc.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,14 +19,11 @@ public class AccountService {
     private static final Logger logger = LoggerFactory.getLogger(AccountService.class);
 
     private final AccountRepository accountRepository;
-    private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
 
     public AccountService(AccountRepository accountRepository,
-                          TransactionRepository transactionRepository,
                           UserRepository userRepository) {
         this.accountRepository = accountRepository;
-        this.transactionRepository = transactionRepository;
         this.userRepository = userRepository;
     }
 
@@ -46,7 +41,7 @@ public class AccountService {
         account.setUser(user);
         account.setName(request.name());
         account.setType(request.type());
-        account.setInitialBalance(request.initialBalance());
+        account.setBalance(request.balance());
         account.setCurrency(request.currency());
         account = accountRepository.save(account);
         logger.info("User with id = {} create new account", userId);
@@ -63,7 +58,7 @@ public class AccountService {
         }
         account.setName(request.name());
         account.setType(request.type());
-        account.setInitialBalance(request.initialBalance());
+        account.setBalance(request.balance());
         account.setCurrency(request.currency());
         account = accountRepository.save(account);
         logger.info("User with id = {} update account with id = {}", userId, id);
@@ -94,14 +89,7 @@ public class AccountService {
     }
 
     private AccountResponse toResponse(Account account) {
-        BigDecimal income = transactionRepository.sumByUserIdAndTypeAndDateBetween(
-                account.getUser().getId(), Transaction.TransactionType.INCOME,
-                java.time.LocalDate.of(1900, 1, 1), java.time.LocalDate.of(2100, 1, 1));
-        BigDecimal expense = transactionRepository.sumByUserIdAndTypeAndDateBetween(
-                account.getUser().getId(), Transaction.TransactionType.EXPENSE,
-                java.time.LocalDate.of(1900, 1, 1), java.time.LocalDate.of(2100, 1, 1));
-        BigDecimal currentBalance = account.getInitialBalance().add(income).subtract(expense);
         return new AccountResponse(account.getId(), account.getName(), account.getType(),
-                account.getInitialBalance(), account.getCurrency(), currentBalance, account.getCreatedAt());
+                account.getBalance(), account.getCurrency(), account.getBalance(), account.getCreatedAt());
     }
 }

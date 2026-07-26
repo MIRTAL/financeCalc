@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -66,6 +67,17 @@ public class TransactionService {
         }
 
         transaction = transactionRepository.save(transaction);
+        applyBalance(account, request.type(), request.amount());
+
+        if (request.type() == Transaction.TransactionType.TRANSFER) {
+            accountRepository.findByUserId(userId).stream()
+                    .filter(a -> a.getType() == Account.AccountType.MONEY_BOX)
+                    .findFirst().ifPresent(mb -> {
+                        mb.setBalance(mb.getBalance().add(request.amount()));
+                        accountRepository.save(mb);
+                    });
+        }
+
         return toResponse(transaction);
     }
 
@@ -77,6 +89,8 @@ public class TransactionService {
             logger.warn("User with id {} trying to update not his transaction with id = {}", userId, id);
             throw new RuntimeException("Access denied");
         }
+
+        Account oldAccount = transaction.getAccount();
 
         Account account = accountRepository.findById(request.accountId())
                 .orElseThrow(() -> new RuntimeException("Account not found"));
@@ -106,7 +120,28 @@ public class TransactionService {
             logger.warn("User with id {} trying to delete not his transaction with id = {}", userId, id);
             throw new RuntimeException("Access denied");
         }
+        Account account = transaction.getAccount();
+        applyBalance(account, transaction.getType(), transaction.getAmount().negate());
+
+        if (transaction.getType() == Transaction.TransactionType.TRANSFER) {
+            accountRepository.findByUserId(userId).stream()
+                    .filter(a -> a.getType() == Account.AccountType.MONEY_BOX)
+                    .findFirst().ifPresent(mb -> {
+                        mb.setBalance(mb.getBalance().subtract(transaction.getAmount()));
+                        accountRepository.save(mb);
+                    });
+        }
+
         transactionRepository.delete(transaction);
+    }
+
+    private void applyBalance(Account account, Transaction.TransactionType type, BigDecimal amount) {
+        switch (type) {
+            case INCOME -> account.setBalance(account.getBalance().add(amount));
+            case EXPENSE -> account.setBalance(account.getBalance().subtract(amount));
+            default -> {}
+        }
+        accountRepository.save(account);
     }
 
     private TransactionResponse toResponse(Transaction t) {

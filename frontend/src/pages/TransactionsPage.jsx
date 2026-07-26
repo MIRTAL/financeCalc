@@ -23,7 +23,7 @@ export default function TransactionsPage() {
   const [editId, setEditId] = useState(null);
   const [filterTab, setFilterTab] = useState(0);
 
-  const filtered = filterTab === 0 ? items : items.filter((t) => t.type === (filterTab === 1 ? 'INCOME' : 'EXPENSE'));
+  const filtered = filterTab === 0 ? items : items.filter((t) => t.type === (filterTab === 1 ? 'INCOME' : filterTab === 2 ? 'EXPENSE' : 'TRANSFER'));
 
   const load = async () => {
     try {
@@ -37,7 +37,7 @@ export default function TransactionsPage() {
   useEffect(() => { load(); }, []);
 
   const filteredCategories = categories.filter((c) =>
-    form.type === 'INCOME' ? c.type === 'INCOME' : c.type === 'EXPENSE'
+    form.type === 'INCOME' ? c.type === 'INCOME' : form.type === 'TRANSFER' ? c.type === 'TRANSFER' : c.type === 'EXPENSE'
   );
 
   const handleCreate = async () => {
@@ -85,6 +85,7 @@ export default function TransactionsPage() {
         <Tab label="Все транзакции" />
         <Tab label="Доходы" />
         <Tab label="Расходы" />
+        <Tab label="Переводы" />
       </Tabs>
       <Card>
         <Table>
@@ -105,8 +106,8 @@ export default function TransactionsPage() {
                 <TableCell>{formatDate(item.transactionDate)}</TableCell>
                 <TableCell>
                   <Chip
-                    label={item.type === 'INCOME' ? 'Доход' : 'Расход'}
-                    color={item.type === 'INCOME' ? 'success' : 'error'}
+                    label={item.type === 'INCOME' ? 'Доход' : item.type === 'TRANSFER' ? 'Перевод' : 'Расход'}
+                    color={item.type === 'INCOME' ? 'success' : item.type === 'TRANSFER' ? 'default' : 'error'}
                     size="small"
                   />
                 </TableCell>

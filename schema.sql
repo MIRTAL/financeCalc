@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS accounts (
     user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     name VARCHAR(100) NOT NULL,
     type VARCHAR(20) NOT NULL CHECK (type IN ('CASH', 'BANK_CARD', 'E_WALLET', 'MONEY_BOX')),
-    initial_balance DECIMAL(15,2) NOT NULL DEFAULT 0,
+    balance DECIMAL(15,2) NOT NULL DEFAULT 0,
     currency VARCHAR(3) NOT NULL DEFAULT 'BYN',
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     account_id BIGINT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
     category_id BIGINT REFERENCES categories(id) ON DELETE CASCADE,
-    type VARCHAR(10) NOT NULL CHECK (type IN ('INCOME', 'EXPENSE')),
+    type VARCHAR(10) NOT NULL CHECK (type IN ('INCOME', 'EXPENSE', 'TRANSFER')),
     amount DECIMAL(15,2) NOT NULL,
     description VARCHAR(500),
     transaction_date DATE NOT NULL,
