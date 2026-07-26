@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class GoalService {
@@ -33,13 +34,13 @@ public class GoalService {
     }
 
     @Transactional(readOnly = true)
-    public List<GoalResponse> getUserGoals(Long userId) {
+    public List<GoalResponse> getUserGoals(UUID userId) {
         return goalRepository.findByUserId(userId).stream()
                 .map(this::toResponse).toList();
     }
 
     @Transactional
-    public GoalResponse createGoal(Long userId, GoalRequest request) {
+    public GoalResponse createGoal(UUID userId, GoalRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -55,7 +56,7 @@ public class GoalService {
     }
 
     @Transactional
-    public GoalResponse updateGoal(Long id, Long userId, GoalRequest request) {
+    public GoalResponse updateGoal(Long id, UUID userId, GoalRequest request) {
         FinancialGoal goal = goalRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Goal not found"));
         if (!goal.getUser().getId().equals(userId)) {
@@ -72,7 +73,7 @@ public class GoalService {
     }
 
     @Transactional
-    public void deleteGoal(Long id, Long userId) {
+    public void deleteGoal(Long id, UUID userId) {
         FinancialGoal goal = goalRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Goal not found"));
         if (!goal.getUser().getId().equals(userId)) {
@@ -84,7 +85,7 @@ public class GoalService {
     }
 
     @Transactional
-    public GoalResponse addToGoal(Long id, Long userId, BigDecimal amount, Long accountId) {
+    public GoalResponse addToGoal(Long id, UUID userId, BigDecimal amount, Long accountId) {
         FinancialGoal goal = goalRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Goal not found"));
         if (!goal.getUser().getId().equals(userId)) {
@@ -111,7 +112,7 @@ public class GoalService {
     }
 
     @Transactional
-    public GoalResponse withdrawFromGoal(Long id, Long userId, BigDecimal amount, Long accountId) {
+    public GoalResponse withdrawFromGoal(Long id, UUID userId, BigDecimal amount, Long accountId) {
         FinancialGoal goal = goalRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Goal not found"));
         if (!goal.getUser().getId().equals(userId)) {
@@ -137,7 +138,7 @@ public class GoalService {
     }
 
     @Transactional
-    public GoalResponse spendFromGoal(Long id, Long userId, BigDecimal amount, Long accountId) {
+    public GoalResponse spendFromGoal(Long id, UUID userId, BigDecimal amount, Long accountId) {
         FinancialGoal goal = goalRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Goal not found"));
         if (!goal.getUser().getId().equals(userId)) {

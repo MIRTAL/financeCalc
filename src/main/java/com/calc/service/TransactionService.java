@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class TransactionService {
@@ -33,20 +34,20 @@ public class TransactionService {
     }
 
     @Transactional(readOnly = true)
-    public List<TransactionResponse> getUserTransactions(Long userId) {
+    public List<TransactionResponse> getUserTransactions(UUID userId) {
         return transactionRepository.findByUserIdOrderByTransactionDateDescCreatedAtDesc(userId)
                 .stream().map(this::toResponse).toList();
     }
 
     @Transactional(readOnly = true)
-    public List<TransactionResponse> getTransactionsByPeriod(Long userId, LocalDate start, LocalDate end) {
+    public List<TransactionResponse> getTransactionsByPeriod(UUID userId, LocalDate start, LocalDate end) {
         return transactionRepository
                 .findByUserIdAndTransactionDateBetweenOrderByTransactionDateDesc(userId, start, end)
                 .stream().map(this::toResponse).toList();
     }
 
     @Transactional
-    public TransactionResponse createTransaction(Long userId, TransactionRequest request) {
+    public TransactionResponse createTransaction(UUID userId, TransactionRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Account account = accountRepository.findById(request.accountId())
@@ -82,7 +83,7 @@ public class TransactionService {
     }
 
     @Transactional
-    public TransactionResponse updateTransaction(Long id, Long userId, TransactionRequest request) {
+    public TransactionResponse updateTransaction(Long id, UUID userId, TransactionRequest request) {
         Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Transaction not found"));
         if (!transaction.getUser().getId().equals(userId)) {
@@ -113,7 +114,7 @@ public class TransactionService {
     }
 
     @Transactional
-    public void deleteTransaction(Long id, Long userId) {
+    public void deleteTransaction(Long id, UUID userId) {
         Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Transaction not found"));
         if (!transaction.getUser().getId().equals(userId)) {

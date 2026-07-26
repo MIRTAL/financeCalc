@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class AccountService {
@@ -28,13 +29,13 @@ public class AccountService {
     }
 
     @Transactional(readOnly = true)
-    public List<AccountResponse> getUserAccounts(Long userId) {
+    public List<AccountResponse> getUserAccounts(UUID userId) {
         List<Account> accounts = accountRepository.findByUserId(userId);
         return accounts.stream().map(this::toResponse).toList();
     }
 
     @Transactional
-    public AccountResponse createAccount(Long userId, AccountRequest request) {
+    public AccountResponse createAccount(UUID userId, AccountRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Account account = new Account();
@@ -49,7 +50,7 @@ public class AccountService {
     }
 
     @Transactional
-    public AccountResponse updateAccount(Long id, Long userId, AccountRequest request) {
+    public AccountResponse updateAccount(Long id, UUID userId, AccountRequest request) {
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
         if (!account.getUser().getId().equals(userId)) {
@@ -66,7 +67,7 @@ public class AccountService {
     }
 
     @Transactional
-    public void deleteAccount(Long id, Long userId) {
+    public void deleteAccount(Long id, UUID userId) {
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
         if (!account.getUser().getId().equals(userId)) {
@@ -78,7 +79,7 @@ public class AccountService {
     }
 
     @Transactional(readOnly = true)
-    public AccountResponse getAccount(Long id, Long userId) {
+    public AccountResponse getAccount(Long id, UUID userId) {
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
         if (!account.getUser().getId().equals(userId)) {

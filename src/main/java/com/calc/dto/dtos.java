@@ -4,6 +4,7 @@ import com.calc.entity.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import java.util.List;
 import java.util.Map;
 
@@ -11,7 +12,7 @@ public class dtos {
 
     public record RegisterRequest(String username, String password, String email) {}
     public record AuthRequest(String username, String password) {}
-    public record AuthResponse(String token, Long userId, String username) {}
+    public record AuthResponse(String token, UUID userId, String username) {}
     public record ErrorResponse(int status, String message, String description) {}
 
     public record AccountRequest(String name, Account.AccountType type, BigDecimal balance, String currency) {}

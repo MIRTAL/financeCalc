@@ -6,7 +6,7 @@
 \c finance_calc;
 
 CREATE TABLE IF NOT EXISTS users (
-    id BIGSERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
@@ -25,12 +25,17 @@ CREATE TABLE IF NOT EXISTS accounts (
 
 CREATE TABLE IF NOT EXISTS categories (
     id BIGSERIAL PRIMARY KEY,
-    user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
     name VARCHAR(100) NOT NULL,
-    type VARCHAR(10) NOT NULL CHECK (type IN ('INCOME', 'EXPENSE')),
+    type VARCHAR(10) NOT NULL CHECK (type IN ('INCOME', 'EXPENSE', 'TRANSFER')),
     icon VARCHAR(50),
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
+
+INSERT INTO categories (id, name, type) VALUES (1, 'Пополнение копилки', 'TRANSFER') ON CONFLICT (id) DO NOTHING;
+INSERT INTO categories (id, name, type) VALUES (2, 'Снятие с копилки', 'TRANSFER') ON CONFLICT (id) DO NOTHING;
+INSERT INTO categories (id, name, type) VALUES (3, 'Переводы между счетами', 'TRANSFER') ON CONFLICT (id) DO NOTHING;
+SELECT setval('categories_id_seq', (SELECT COALESCE(MAX(id), 0) + 1 FROM categories));
 
 CREATE TABLE IF NOT EXISTS transactions (
     id BIGSERIAL PRIMARY KEY,

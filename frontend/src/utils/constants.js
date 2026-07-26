@@ -7,6 +7,7 @@ export const ACCOUNT_TYPES = [
 export const CATEGORY_TYPES = [
   { value: 'INCOME', label: 'Доход' },
   { value: 'EXPENSE', label: 'Расход' },
+  { value: 'TRANSFER', label: 'Перевод' },
 ];
 
 export const TRANSACTION_TYPES = [

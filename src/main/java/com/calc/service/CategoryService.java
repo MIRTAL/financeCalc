@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class CategoryService {
@@ -26,7 +27,7 @@ public class CategoryService {
     }
 
     @Transactional(readOnly = true)
-    public List<CategoryResponse> getUserCategories(Long userId) {
+    public List<CategoryResponse> getUserCategories(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return categoryRepository.findByUserOrderByTypeAscNameAsc(user).stream()
@@ -34,7 +35,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryResponse createCategory(Long userId, CategoryRequest request) {
+    public CategoryResponse createCategory(UUID userId, CategoryRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Category category = new Category();
@@ -48,7 +49,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryResponse updateCategory(Long id, Long userId, CategoryRequest request) {
+    public CategoryResponse updateCategory(Long id, UUID userId, CategoryRequest request) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found"));
         if (!category.getUser().getId().equals(userId)) {
@@ -64,7 +65,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public void deleteCategory(Long id, Long userId) {
+    public void deleteCategory(Long id, UUID userId) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found"));
         if (!category.getUser().getId().equals(userId)) {

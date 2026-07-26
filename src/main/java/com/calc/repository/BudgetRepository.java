@@ -5,8 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface BudgetRepository extends JpaRepository<Budget, Long> {
-    List<Budget> findByUserId(Long userId);
-    Optional<Budget> findByUserIdAndCategoryId(Long userId, Long categoryId);
+    List<Budget> findByUserId(UUID userId);
+    Optional<Budget> findByUserIdAndCategoryId(UUID userId, Long categoryId);
 }

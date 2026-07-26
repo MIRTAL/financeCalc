@@ -1,5 +1,7 @@
 package com.calc.controller;
 
+import java.util.UUID;
+
 import com.calc.dto.dtos.DashboardResponse;
 import com.calc.security.SecurityUtil;
 import com.calc.service.DashboardService;
@@ -26,7 +28,7 @@ public class DashboardController {
             @RequestParam(required = false) LocalDate start,
             @RequestParam(required = false) LocalDate end,
             Authentication auth) {
-        Long userId = securityUtil.getCurrentUserId(auth);
+        UUID userId = securityUtil.getCurrentUserId(auth);
         if (start == null) start = LocalDate.now().withDayOfMonth(1);
         if (end == null) end = LocalDate.now();
         return ResponseEntity.ok(dashboardService.getDashboard(userId, start, end));

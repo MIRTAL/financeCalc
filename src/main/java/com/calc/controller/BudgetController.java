@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/budgets")
@@ -26,7 +27,7 @@ public class BudgetController {
             @RequestParam(required = false) Integer year,
             @RequestParam(required = false) Integer month,
             Authentication auth) {
-        Long userId = securityUtil.getCurrentUserId(auth);
+        UUID userId = securityUtil.getCurrentUserId(auth);
         if (year != null && month != null) {
             return ResponseEntity.ok(budgetService.getUserBudgetsByMonth(userId, year, month));
         }

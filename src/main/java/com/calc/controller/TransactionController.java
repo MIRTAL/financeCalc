@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/transactions")
@@ -27,7 +28,7 @@ public class TransactionController {
             @RequestParam(required = false) LocalDate start,
             @RequestParam(required = false) LocalDate end,
             Authentication auth) {
-        Long userId = securityUtil.getCurrentUserId(auth);
+        UUID userId = securityUtil.getCurrentUserId(auth);
         if (start != null && end != null) {
             return ResponseEntity.ok(transactionService.getTransactionsByPeriod(userId, start, end));
         }

@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class RecurringOperationService {
@@ -36,13 +37,13 @@ public class RecurringOperationService {
     }
 
     @Transactional(readOnly = true)
-    public List<RecurringResponse> getUserRecurring(Long userId) {
+    public List<RecurringResponse> getUserRecurring(UUID userId) {
         return recurringRepository.findByUserId(userId).stream()
                 .map(this::toResponse).toList();
     }
 
     @Transactional
-    public RecurringResponse createRecurring(Long userId, RecurringRequest request) {
+    public RecurringResponse createRecurring(UUID userId, RecurringRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Account account = accountRepository.findById(request.accountId())
@@ -70,7 +71,7 @@ public class RecurringOperationService {
     }
 
     @Transactional
-    public RecurringResponse updateRecurring(Long id, Long userId, RecurringRequest request) {
+    public RecurringResponse updateRecurring(Long id, UUID userId, RecurringRequest request) {
         RecurringOperation op = recurringRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Recurring operation not found"));
         if (!op.getUser().getId().equals(userId)) {
@@ -99,7 +100,7 @@ public class RecurringOperationService {
     }
 
     @Transactional
-    public void deleteRecurring(Long id, Long userId) {
+    public void deleteRecurring(Long id, UUID userId) {
         RecurringOperation op = recurringRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Recurring operation not found"));
         if (!op.getUser().getId().equals(userId)) {
@@ -109,7 +110,7 @@ public class RecurringOperationService {
     }
 
     @Transactional
-    public void toggleActive(Long id, Long userId) {
+    public void toggleActive(Long id, UUID userId) {
         RecurringOperation op = recurringRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Recurring operation not found"));
         if (!op.getUser().getId().equals(userId)) {

@@ -5,6 +5,8 @@ import com.calc.repository.UserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 public class SecurityUtil {
 
@@ -14,7 +16,7 @@ public class SecurityUtil {
         this.userRepository = userRepository;
     }
 
-    public Long getCurrentUserId(Authentication auth) {
+    public UUID getCurrentUserId(Authentication auth) {
         String username = auth.getName();
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found: " + username));

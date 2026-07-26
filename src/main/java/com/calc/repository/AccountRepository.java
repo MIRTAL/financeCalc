@@ -5,8 +5,9 @@ import com.calc.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface AccountRepository extends JpaRepository<Account, Long> {
     List<Account> findByUserOrderByCreatedAtDesc(User user);
-    List<Account> findByUserId(Long userId);
+    List<Account> findByUserId(UUID userId);
 }

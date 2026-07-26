@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class BudgetService {
@@ -33,13 +34,13 @@ public class BudgetService {
     }
 
     @Transactional(readOnly = true)
-    public List<BudgetResponse> getUserBudgets(Long userId) {
+    public List<BudgetResponse> getUserBudgets(UUID userId) {
         return budgetRepository.findByUserId(userId).stream()
                 .map(this::toResponse).toList();
     }
 
     @Transactional(readOnly = true)
-    public List<BudgetResponse> getUserBudgetsByMonth(Long userId, int year, int month) {
+    public List<BudgetResponse> getUserBudgetsByMonth(UUID userId, int year, int month) {
         LocalDate monthStart = LocalDate.of(year, month, 1);
         LocalDate monthEnd = monthStart.withDayOfMonth(monthStart.lengthOfMonth());
         return budgetRepository.findByUserId(userId).stream()
@@ -48,7 +49,7 @@ public class BudgetService {
     }
 
     @Transactional
-    public BudgetResponse createBudget(Long userId, BudgetRequest request) {
+    public BudgetResponse createBudget(UUID userId, BudgetRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Category category = categoryRepository.findById(request.categoryId())
@@ -64,7 +65,7 @@ public class BudgetService {
     }
 
     @Transactional
-    public BudgetResponse updateBudget(Long id, Long userId, BudgetRequest request) {
+    public BudgetResponse updateBudget(Long id, UUID userId, BudgetRequest request) {
         Budget budget = budgetRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Budget not found"));
         if (!budget.getUser().getId().equals(userId)) {
@@ -82,7 +83,7 @@ public class BudgetService {
     }
 
     @Transactional
-    public void deleteBudget(Long id, Long userId) {
+    public void deleteBudget(Long id, UUID userId) {
         Budget budget = budgetRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Budget not found"));
         if (!budget.getUser().getId().equals(userId)) {

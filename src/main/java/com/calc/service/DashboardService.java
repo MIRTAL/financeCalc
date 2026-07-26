@@ -1,5 +1,7 @@
 package com.calc.service;
 
+import java.util.UUID;
+
 import com.calc.dto.dtos.*;
 import com.calc.entity.*;
 import com.calc.repository.*;
@@ -35,7 +37,7 @@ public class DashboardService {
     }
 
     @Transactional(readOnly = true)
-    public DashboardResponse getDashboard(Long userId, LocalDate start, LocalDate end) {
+    public DashboardResponse getDashboard(UUID userId, LocalDate start, LocalDate end) {
         BigDecimal income = Optional.ofNullable(
                 transactionRepository.sumByUserIdAndTypeAndDateBetween(
                         userId, Transaction.TransactionType.INCOME, start, end))
